@@ -13,10 +13,23 @@ git init
 
 ## Step 2: Create GitHub Repository
 
-### Option A: Using GitHub CLI (Recommended)
+### Option A: Using GitHub API (Recommended)
 
 ```bash
-gh repo create prodkit --public --source=. --description="Enterprise-grade product development workflow for AI coding agents"
+# Set your GitHub credentials
+GITHUB_TOKEN="your-personal-access-token"
+REPO_NAME="prodkit"
+
+# Create repository via GitHub API
+curl -X POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  https://api.github.com/user/repos \
+  -d "{\"name\":\"$REPO_NAME\",\"description\":\"Enterprise-grade product development workflow for AI coding agents\",\"private\":false}"
+
+# Connect your local repo
+git remote add origin https://github.com/YOUR_USERNAME/prodkit.git
 ```
 
 ### Option B: Using GitHub Web Interface
@@ -73,16 +86,19 @@ git push -u origin main
 
 ### Add Topics
 
-Add relevant topics to help people discover ProdKit:
+Add relevant topics to help people discover ProdKit using GitHub API:
 
 ```bash
-gh repo edit --add-topic "ai"
-gh repo edit --add-topic "claude-code"
-gh repo edit --add-topic "development-workflow"
-gh repo edit --add-topic "tdd"
-gh repo edit --add-topic "github-integration"
-gh repo edit --add-topic "project-management"
-gh repo edit --add-topic "sprint-planning"
+GITHUB_TOKEN="your-token"
+OWNER="kiranshivaraju"
+REPO="prodkit"
+
+# Update repository with topics
+curl -X PATCH \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  "https://api.github.com/repos/$OWNER/$REPO" \
+  -d '{"topics":["ai","claude-code","development-workflow","tdd","github-integration","project-management","sprint-planning"]}'
 ```
 
 Or via web:
@@ -93,13 +109,21 @@ Or via web:
 ### Set Repository Description
 
 ```bash
-gh repo edit --description "Enterprise-grade product development workflow for AI coding agents"
+curl -X PATCH \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  "https://api.github.com/repos/$OWNER/$REPO" \
+  -d '{"description":"Enterprise-grade product development workflow for AI coding agents"}'
 ```
 
 ### Add Website
 
 ```bash
-gh repo edit --homepage "https://github.com/kiranshivaraju/prodkit"
+curl -X PATCH \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  "https://api.github.com/repos/$OWNER/$REPO" \
+  -d '{"homepage":"https://github.com/kiranshivaraju/prodkit"}'
 ```
 
 ## Step 5: Create a Release
@@ -122,10 +146,18 @@ git push origin v1.0.0
 
 ### Create GitHub Release
 
+Using GitHub API:
+
 ```bash
-gh release create v1.0.0 \
-  --title "ProdKit v1.0.0 - Initial Release" \
-  --notes "## ProdKit v1.0.0
+# Create release
+curl -X POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  "https://api.github.com/repos/$OWNER/$REPO/releases" \
+  -d '{
+    "tag_name": "v1.0.0",
+    "name": "ProdKit v1.0.0 - Initial Release",
+    "body": "## ProdKit v1.0.0
 
 **First stable release!**
 
@@ -166,13 +198,16 @@ cd prodkit
 ### Requirements
 
 - Claude Code
-- GitHub CLI (gh)
 - Git
-- Speckit (optional, for /dev command)
+- GitHub Personal Access Token
+- Speckit (automatically installed)
 
 ---
 
-**Ready to build?** See [QUICKSTART.md](QUICKSTART.md) to get started!"
+**Ready to build?** See [QUICKSTART.md](QUICKSTART.md) to get started!",
+    "draft": false,
+    "prerelease": false
+  }'
 ```
 
 ## Step 6: Update README with Correct URLs

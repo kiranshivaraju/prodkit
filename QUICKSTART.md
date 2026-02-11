@@ -7,9 +7,9 @@ Get up and running with ProdKit in 5 minutes.
 Before you start, make sure you have:
 
 - ✅ Claude Code installed
-- ✅ GitHub CLI (`gh`) installed and authenticated
 - ✅ Git installed
-- ✅ Speckit installed (optional, but recommended for `/prodkit.dev` command)
+- ✅ GitHub Personal Access Token (instructions provided during setup)
+- ✅ Speckit installed (optional, automatically installed by ProdKit)
 
 ## Installation
 

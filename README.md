@@ -532,17 +532,38 @@ Make sure:
 
 ## Troubleshooting
 
-### GitHub CLI not authenticated
+### GitHub token invalid or expired
+
+If you see authentication errors:
 
 ```bash
-gh auth login
+# Generate new token at: https://github.com/settings/tokens
+# Ensure it has 'repo' and 'workflow' scopes
+# Save to: .prodkit/.github-token
+
+echo "your-new-token-here" > .prodkit/.github-token
+chmod 600 .prodkit/.github-token
+```
+
+### GitHub token missing
+
+Run `/prodkit.init-repo` to set up your GitHub token, or create it manually:
+
+```bash
+# Create token file
+echo "your-github-pat" > .prodkit/.github-token
+chmod 600 .prodkit/.github-token
+
+# Add to .gitignore
+echo ".prodkit/.github-token" >> .gitignore
 ```
 
 ### Speckit not found
 
-Install Speckit:
+Speckit is automatically installed by ProdKit. If you need to reinstall:
 ```bash
-# Follow instructions at https://github.com/github/spec-kit
+# Run the ProdKit installer again
+./install.sh .
 ```
 
 ### Tests failing during /prodkit.dev

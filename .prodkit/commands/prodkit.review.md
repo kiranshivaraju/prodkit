@@ -34,25 +34,45 @@ Read `sprints/v{N}/sprint-plan.md` to understand:
 
 #### b. Query Closed Issues
 
-Get all closed issues for this sprint:
+Get all closed issues for this sprint using GitHub API:
 
 ```bash
-gh issue list \
-  --milestone "Sprint v{N}" \
-  --state closed \
-  --json number,title,closedAt,labels \
-  --limit 100
+# Read GitHub credentials
+GITHUB_TOKEN=$(cat .prodkit/.github-token | tr -d '[:space:]')
+REPO=$(grep "repo:" .prodkit/config.yml | sed 's/.*repo: "\(.*\)".*/\1/' | sed 's/.*repo: //' | tr -d '"' | tr -d ' ')
+SPRINT_NUM=$(grep "current:" .prodkit/config.yml | sed 's/.*current: //')
+
+# Get milestone number
+MILESTONE_RESPONSE=$(curl -s \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  "https://api.github.com/repos/$REPO/milestones")
+
+MILESTONE_NUMBER=$(echo "$MILESTONE_RESPONSE" | jq -r ".[] | select(.title == \"Sprint v${SPRINT_NUM}\") | .number")
+
+# Get closed issues
+CLOSED_ISSUES=$(curl -s \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  "https://api.github.com/repos/$REPO/issues?milestone=$MILESTONE_NUMBER&state=closed&per_page=100")
+
+# Extract issue details
+echo "$CLOSED_ISSUES" | jq -r '.[] | {number, title, closed_at, labels: [.labels[].name]}'
 ```
 
 #### c. Query Merged PRs
 
-Get all merged PRs for this sprint:
+Get all merged PRs for this sprint using GitHub API:
 
 ```bash
-gh pr list \
-  --search "milestone:\"Sprint v{N}\" is:merged" \
-  --json number,title,mergedAt,additions,deletions \
-  --limit 100
+# Get merged PRs
+MERGED_PRS=$(curl -s \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  "https://api.github.com/repos/$REPO/pulls?state=closed&per_page=100")
+
+# Filter for merged PRs in this milestone
+echo "$MERGED_PRS" | jq -r '.[] | select(.merged_at != null) | {number, title, merged_at, additions, deletions, changed_files}'
 ```
 
 #### d. Get Code Statistics
