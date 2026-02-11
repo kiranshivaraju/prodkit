@@ -31,7 +31,7 @@ gh repo create prodkit --public --source=. --description="Enterprise-grade produ
 Then connect your local repo:
 
 ```bash
-git remote add origin https://github.com/YOUR_USERNAME/prodkit.git
+git remote add origin https://github.com/kiranshivaraju/prodkit.git
 ```
 
 ## Step 3: Commit and Push
@@ -53,14 +53,14 @@ for AI coding agents. Includes:
 - Automated sprint reviews
 
 Commands:
-- /prd - Create PRD
-- /product-arch - Define architecture
-- /init-repo - Initialize repository
-- /plan-sprint - Plan sprint
-- /sprint-tech - Create technical specs
-- /create-issues - Generate GitHub issues
-- /dev - Implement issue with TDD
-- /review - Generate sprint review
+- /prodkit.prd - Create PRD
+- /prodkit.product-arch - Define architecture
+- /prodkit.init-repo - Initialize repository
+- /prodkit.plan-sprint - Plan sprint
+- /prodkit.sprint-tech - Create technical specs
+- /prodkit.create-issues - Generate GitHub issues
+- /prodkit.dev - Implement issue with TDD
+- /prodkit.review - Generate sprint review
 
 Inspired by GitHub Speckit"
 
@@ -99,7 +99,7 @@ gh repo edit --description "Enterprise-grade product development workflow for AI
 ### Add Website
 
 ```bash
-gh repo edit --homepage "https://github.com/YOUR_USERNAME/prodkit"
+gh repo edit --homepage "https://github.com/kiranshivaraju/prodkit"
 ```
 
 ## Step 5: Create a Release
@@ -140,19 +140,19 @@ gh release create v1.0.0 \
 
 ### Commands
 
-- \`/prd\` - Create Product Requirements Document
-- \`/product-arch\` - Define system architecture
-- \`/init-repo\` - Initialize GitHub repository
-- \`/plan-sprint\` - Plan sprint features
-- \`/sprint-tech\` - Create sprint technical docs
-- \`/create-issues\` - Generate GitHub Issues
-- \`/dev\` - Implement issue with TDD (uses Speckit)
-- \`/review\` - Generate sprint retrospective
+- \`/prodkit.prd\` - Create Product Requirements Document
+- \`/prodkit.product-arch\` - Define system architecture
+- \`/prodkit.init-repo\` - Initialize GitHub repository
+- \`/prodkit.plan-sprint\` - Plan sprint features
+- \`/prodkit.sprint-tech\` - Create sprint technical docs
+- \`/prodkit.create-issues\` - Generate GitHub Issues
+- \`/prodkit.dev\` - Implement issue with TDD (uses Speckit)
+- \`/prodkit.review\` - Generate sprint retrospective
 
 ### Installation
 
 \`\`\`bash
-git clone https://github.com/YOUR_USERNAME/prodkit.git
+git clone https://github.com/kiranshivaraju/prodkit.git
 cd prodkit
 ./install.sh /path/to/your/project
 \`\`\`
@@ -179,12 +179,12 @@ cd prodkit
 
 After pushing, update all placeholder URLs in README.md:
 
-1. Replace `YOUR_USERNAME` with your actual GitHub username
+1. Replace `kiranshivaraju` with your actual GitHub username
 2. Replace `yourusername` with your GitHub username
 
 ```bash
 # Example using sed (macOS)
-sed -i '' 's/YOUR_USERNAME/your-actual-username/g' README.md
+sed -i '' 's/kiranshivaraju/your-actual-username/g' README.md
 sed -i '' 's/yourusername/your-actual-username/g' README.md QUICKSTART.md CONTRIBUTING.md
 
 # Commit the changes
@@ -201,8 +201,8 @@ Add badges to your README for polish:
 # ProdKit
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub release](https://img.shields.io/github/v/release/YOUR_USERNAME/prodkit)](https://github.com/YOUR_USERNAME/prodkit/releases)
-[![GitHub stars](https://img.shields.io/github/stars/YOUR_USERNAME/prodkit)](https://github.com/YOUR_USERNAME/prodkit/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/kiranshivaraju/prodkit)](https://github.com/kiranshivaraju/prodkit/releases)
+[![GitHub stars](https://img.shields.io/github/stars/kiranshivaraju/prodkit)](https://github.com/kiranshivaraju/prodkit/stargazers)
 ```
 
 ## Step 8: Set Up GitHub Pages (Optional)
@@ -246,11 +246,11 @@ After setup, verify these settings:
 
 After setup, your repository will have:
 
-- **Main page:** `https://github.com/YOUR_USERNAME/prodkit`
-- **Releases:** `https://github.com/YOUR_USERNAME/prodkit/releases`
-- **Issues:** `https://github.com/YOUR_USERNAME/prodkit/issues`
-- **Discussions:** `https://github.com/YOUR_USERNAME/prodkit/discussions`
-- **Clone URL:** `https://github.com/YOUR_USERNAME/prodkit.git`
+- **Main page:** `https://github.com/kiranshivaraju/prodkit`
+- **Releases:** `https://github.com/kiranshivaraju/prodkit/releases`
+- **Issues:** `https://github.com/kiranshivaraju/prodkit/issues`
+- **Discussions:** `https://github.com/kiranshivaraju/prodkit/discussions`
+- **Clone URL:** `https://github.com/kiranshivaraju/prodkit.git`
 
 ## Maintenance
 
@@ -279,13 +279,13 @@ Users can now install ProdKit in multiple ways:
 ### Method 1: One-Line Install (Recommended)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/prodkit/main/install-remote.sh | bash -s /path/to/project
+curl -fsSL https://raw.githubusercontent.com/kiranshivaraju/prodkit/main/install-remote.sh | bash -s /path/to/project
 ```
 
 ### Method 2: Clone and Install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/prodkit.git
+git clone https://github.com/kiranshivaraju/prodkit.git
 cd prodkit
 ./install.sh /path/to/project
 ```
@@ -294,4 +294,4 @@ cd prodkit
 
 See README.md for manual installation instructions.
 
-**Remember to update `YOUR_USERNAME` in README.md and QUICKSTART.md with your actual GitHub username!**
+**Remember to update `kiranshivaraju` in README.md and QUICKSTART.md with your actual GitHub username!**

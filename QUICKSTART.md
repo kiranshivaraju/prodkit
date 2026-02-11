@@ -21,18 +21,16 @@ mkdir my-new-product
 cd my-new-product
 
 # Install ProdKit directly from GitHub
-curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/prodkit/main/install-remote.sh | bash -s .
+curl -fsSL https://raw.githubusercontent.com/kiranshivaraju/prodkit/main/install-remote.sh | bash -s .
 ```
 
 **Or** if you prefer to clone first:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/prodkit.git
+git clone https://github.com/kiranshivaraju/prodkit.git
 cd prodkit
 ./install.sh /path/to/your/project
 ```
-
-> Replace `YOUR_USERNAME` with the actual GitHub username
 
 ### Open in Claude Code
 
