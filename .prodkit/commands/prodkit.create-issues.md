@@ -207,7 +207,130 @@ Based on the implementation plan:
 - `refactor` - Code improvements
 - `documentation` - Documentation updates
 
-### Step 7: Create Issues via GitHub API
+### Step 7: Generate Issue Descriptions and Save Preview
+
+Before creating issues in GitHub, generate all issue descriptions and save them to a preview file for user review.
+
+Create `sprints/v{N}/issues-preview.md` with all the issue details:
+
+```markdown
+# GitHub Issues Preview - Sprint v{N}
+
+**Generated:** {Date}
+**Total Issues:** {X}
+
+---
+
+## Issue 1: [P0][infrastructure] Create database migrations for User table
+
+**Labels:** P0, infrastructure
+**Milestone:** Sprint v{N}
+
+### Description
+
+[Full issue description]
+
+### Context
+
+Sprint: v{N}
+Feature: [Feature name]
+Phase: [Phase name]
+
+### Detailed Requirements
+
+[All requirements copied from tech docs]
+
+### Testing Requirements
+
+[All test requirements]
+
+### Acceptance Criteria
+
+[All criteria]
+
+### Dependencies
+
+[Any dependencies]
+
+---
+
+## Issue 2: [P0][feature] Implement User model
+
+[Same structure as above]
+
+---
+
+[... Continue for all issues]
+```
+
+Display a summary to the user:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ISSUES PREVIEW - SPRINT v{N}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Generated {X} issues from technical documentation:
+
+P0 (Critical): {X} issues
+  1. [infrastructure] Create database migrations for User table
+  2. [feature] Implement User model
+  3. [unit-test] Unit tests for User model
+  ...
+
+P1 (High): {Y} issues
+  13. [contract-test] Contract tests for registration endpoint
+  ...
+
+P2 (Medium): {Z} issues
+  18. [feature] Add security headers middleware
+  ...
+
+Full details saved to: sprints/v{N}/issues-preview.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### Step 8: Ask User for Confirmation
+
+Use the AskUserQuestion tool to ask the user to review and confirm:
+
+```
+IMPORTANT: Please review the issues before creation.
+
+Open: sprints/v{N}/issues-preview.md
+
+Review all {X} issues to ensure:
+- Issue descriptions are complete and accurate
+- All technical details are included
+- Priorities are correct
+- Dependencies are properly noted
+
+Once reviewed, confirm below to create these issues in GitHub.
+```
+
+**Question:**
+- "Ready to create {X} GitHub issues?"
+- Options:
+  - "Yes, create all issues" - Proceed to Step 9
+  - "No, I need to make changes" - Stop and inform user to edit the preview file or tech docs
+
+If user selects "No":
+```
+To make changes:
+1. Edit sprints/v{N}/issues-preview.md directly, OR
+2. Update the tech docs in sprints/v{N}/tech-docs/ and run /prodkit.create-issues again
+
+When ready, run /prodkit.create-issues again.
+```
+
+Exit the command.
+
+If user selects "Yes", proceed to Step 9.
+
+### Step 9: Create Issues via GitHub API
+
+**ONLY execute this step if user confirmed in Step 8.**
 
 For each issue, use the GitHub REST API:
 
@@ -241,7 +364,7 @@ Create issues in dependency order (foundational issues first).
 
 **Note:** Store each created issue number for later reference.
 
-### Step 8: Track Created Issues
+### Step 10: Track Created Issues
 
 Keep a list of created issues with their numbers and titles.
 
@@ -267,7 +390,7 @@ Example:
 ✓ Created Issue #18: [P2][feature] Add security headers middleware
 ```
 
-### Step 9: Link Dependencies
+### Step 11: Link Dependencies
 
 For issues with dependencies, add comments linking them using GitHub API:
 
@@ -283,7 +406,7 @@ curl -X POST \
   -d "{\"body\": \"$COMMENT_BODY\"}"
 ```
 
-### Step 10: Save Issue Summary
+### Step 12: Save Issue Summary
 
 Create `sprints/v{N}/issues-summary.md`:
 
@@ -340,9 +463,11 @@ curl -s \
 ```
 ```
 
-### Step 11: Confirm Completion
+### Step 13: Confirm Completion
 
 Inform the user:
+- ✓ Preview generated: `sprints/v{N}/issues-preview.md`
+- ✓ User reviewed and approved
 - ✓ Created {X} GitHub Issues
 - ✓ All issues assigned to Sprint v{N} milestone
 - ✓ Issues labeled with priority and type
@@ -350,7 +475,23 @@ Inform the user:
 - Summary saved to `sprints/v{N}/issues-summary.md`
 - Next step: Run `/prodkit.dev` to start implementing issues
 
-Display the issue summary. Users can view issues on GitHub or via API:
+Display the issue summary and GitHub links:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ GITHUB ISSUES CREATED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Created {X} issues for Sprint v{N}
+
+View on GitHub:
+https://github.com/$GITHUB_USERNAME/$REPO_NAME/issues?milestone=$MILESTONE_NUMBER
+
+Next step: /prodkit.dev
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+Users can also view issues via API:
 ```bash
 # View open issues in Sprint v{N}
 curl -s \
@@ -421,8 +562,19 @@ Issues should be created in logical order:
 ## Output
 
 After this command, the user should have:
-- {X} GitHub Issues created
-- All issues in Sprint v{N} milestone
+- `sprints/v{N}/issues-preview.md` - Preview file with all issue details (for review)
+- {X} GitHub Issues created in the repository (after user confirmation)
+- All issues assigned to Sprint v{N} milestone
 - Issues properly labeled and prioritized
-- `sprints/v{N}/issues-summary.md` with overview
+- Dependencies documented via comments
+- `sprints/v{N}/issues-summary.md` - Overview of all created issues
 - Ready to start development with `/prodkit.dev`
+
+## Workflow Summary
+
+1. Parse tech docs → Generate issue descriptions
+2. Save preview file → Show summary to user
+3. User reviews preview file
+4. User confirms → Create issues in GitHub
+5. Link dependencies → Save summary
+6. Ready for `/prodkit.dev`
