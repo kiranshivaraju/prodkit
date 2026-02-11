@@ -40,19 +40,17 @@ Install directly from GitHub without cloning:
 
 ```bash
 # Install into your project directory
-curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/prodkit/main/install-remote.sh | bash -s /path/to/your/project
+curl -fsSL https://raw.githubusercontent.com/kiranshivaraju/prodkit/main/install-remote.sh | bash -s /path/to/your/project
 
 # Or install in current directory
-curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/prodkit/main/install-remote.sh | bash -s .
+curl -fsSL https://raw.githubusercontent.com/kiranshivaraju/prodkit/main/install-remote.sh | bash -s .
 ```
-
-> **Note:** Replace `YOUR_USERNAME` with the actual GitHub username after you push the repository.
 
 ### Method 2: Clone and Install
 
 ```bash
 # Clone ProdKit
-git clone https://github.com/YOUR_USERNAME/prodkit.git
+git clone https://github.com/kiranshivaraju/prodkit.git
 cd prodkit
 
 # Install into your project
@@ -66,7 +64,7 @@ cd prodkit
 
 1. **Download ProdKit:**
    ```bash
-   git clone https://github.com/yourusername/prodkit.git
+   git clone https://github.com/kiranshivaraju/prodkit.git
    ```
 
 2. **Copy to your project:**

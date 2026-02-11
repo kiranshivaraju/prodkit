@@ -5,7 +5,7 @@
 
 set -e
 
-PRODKIT_REPO="https://github.com/YOUR_USERNAME/prodkit"
+PRODKIT_REPO="https://github.com/kiranshivaraju/prodkit"
 PRODKIT_BRANCH="main"
 TEMP_DIR=$(mktemp -d)
 
