@@ -32,7 +32,23 @@ ProdKit helps you build products systematically by:
 
 ## Installation
 
-### Quick Install
+Choose one of the installation methods below:
+
+### Method 1: One-Line Install (Recommended)
+
+Install directly from GitHub without cloning:
+
+```bash
+# Install into your project directory
+curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/prodkit/main/install-remote.sh | bash -s /path/to/your/project
+
+# Or install in current directory
+curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/prodkit/main/install-remote.sh | bash -s .
+```
+
+> **Note:** Replace `YOUR_USERNAME` with the actual GitHub username after you push the repository.
+
+### Method 2: Clone and Install
 
 ```bash
 # Clone ProdKit
@@ -46,9 +62,7 @@ cd prodkit
 ./install.sh .
 ```
 
-> **Note:** Replace `YOUR_USERNAME` with your actual GitHub username after you push the repository.
-
-### Manual Install
+### Method 3: Manual Install
 
 1. **Download ProdKit:**
    ```bash
@@ -65,14 +79,14 @@ cd prodkit
    cd /path/to/your/project
    mkdir -p .claude/commands
    cd .claude/commands
-   ln -s ../../.prodkit/commands/prd.md prd.md
-   ln -s ../../.prodkit/commands/product-arch.md product-arch.md
-   ln -s ../../.prodkit/commands/init-repo.md init-repo.md
-   ln -s ../../.prodkit/commands/plan-sprint.md plan-sprint.md
-   ln -s ../../.prodkit/commands/sprint-tech.md sprint-tech.md
-   ln -s ../../.prodkit/commands/create-issues.md create-issues.md
-   ln -s ../../.prodkit/commands/dev.md dev.md
-   ln -s ../../.prodkit/commands/review.md review.md
+   ln -s ../../.prodkit/commands/prodkit.prd.md prd.md
+   ln -s ../../.prodkit/commands/prodkit.product-arch.md product-arch.md
+   ln -s ../../.prodkit/commands/prodkit.init-repo.md init-repo.md
+   ln -s ../../.prodkit/commands/prodkit.plan-sprint.md plan-sprint.md
+   ln -s ../../.prodkit/commands/prodkit.sprint-tech.md sprint-tech.md
+   ln -s ../../.prodkit/commands/prodkit.create-issues.md create-issues.md
+   ln -s ../../.prodkit/commands/prodkit.dev.md dev.md
+   ln -s ../../.prodkit/commands/prodkit.review.md review.md
    ```
 
 4. **Verify installation:**
@@ -110,7 +124,7 @@ cd prodkit
 
 Defines WHAT the product is and WHY it exists. Contains all features, user stories, and success metrics.
 
-**Output:** `product/prd.md`
+**Output:** `product/prodkit.prd.md`
 
 **Run:** Once per product
 
@@ -399,7 +413,20 @@ Before installing ProdKit, ensure you have:
 1. **Claude Code** - ProdKit uses Claude Code slash commands
    - Download from https://claude.com/claude-code
 
-2. **Speckit** - For automated development
+2. **Git** - Version control
+   ```bash
+   # Verify installation
+   git --version
+   ```
+
+3. **GitHub Personal Access Token (PAT)** - For GitHub API integration
+   - Go to https://github.com/settings/tokens
+   - Click "Generate new token (classic)"
+   - Select scopes: `repo`, `workflow`
+   - Copy and save the token securely
+   - You'll provide this token when running ProdKit commands
+
+4. **Speckit** (Optional) - For automated development with `/prodkit.dev`
    ```bash
    # Install Speckit
    git clone https://github.com/github/spec-kit.git
@@ -407,24 +434,13 @@ Before installing ProdKit, ensure you have:
    # Follow installation instructions in their README
    ```
 
-3. **GitHub CLI (`gh`)** - For GitHub integration
+5. **jq** (Optional but recommended) - For parsing JSON from GitHub API
    ```bash
    # macOS
-   brew install gh
+   brew install jq
 
    # Linux (Debian/Ubuntu)
-   sudo apt install gh
-
-   # Or see: https://cli.github.com/
-
-   # Authenticate
-   gh auth login
-   ```
-
-4. **Git** - Version control
-   ```bash
-   # Verify installation
-   git --version
+   sudo apt install jq
    ```
 
 ---

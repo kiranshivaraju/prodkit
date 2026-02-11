@@ -27,20 +27,21 @@ Read `product/tech-docs/architecture.md` to understand:
 - Tech stack
 - Language and framework
 
-### Step 2: Check GitHub CLI
+### Step 2: Check GitHub Personal Access Token
 
-Verify `gh` (GitHub CLI) is installed:
+Ask the user if they have a GitHub Personal Access Token (PAT):
 
-```bash
-gh --version
-```
+If not, guide them to create one:
+1. Go to https://github.com/settings/tokens
+2. Click "Generate new token" → "Generate new token (classic)"
+3. Give it a name (e.g., "ProdKit")
+4. Select scopes:
+   - `repo` (all repository permissions)
+   - `workflow` (if using GitHub Actions)
+5. Click "Generate token"
+6. Copy the token (you won't see it again!)
 
-If not installed, inform the user to install it:
-- macOS: `brew install gh`
-- Linux: https://github.com/cli/cli/blob/trunk/docs/install_linux.md
-- Windows: `winget install GitHub.cli`
-
-Then authenticate: `gh auth login`
+Store the token securely - we'll use it for GitHub API calls.
 
 ### Step 3: Initialize Git Repository
 
@@ -358,14 +359,34 @@ This will set up Speckit in the current directory.
 
 Ask the user:
 - What should the GitHub repository name be? (suggest using project name from config)
+- What is their GitHub username?
 - Should it be public or private?
 - Do they want to create it now or do it manually later?
 
-If they want to create it now:
+If they want to create it now, ask for their Personal Access Token.
+
+**Create the repository using GitHub API:**
 
 ```bash
-gh repo create [repo-name] --[public|private] --source=. --remote=origin
+# Get inputs from user
+GITHUB_USERNAME="[username]"
+REPO_NAME="[repo-name]"
+GITHUB_TOKEN="[their-PAT]"
+PRIVATE="false"  # or "true" for private
+
+# Create repository via GitHub API
+curl -X POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  https://api.github.com/user/repos \
+  -d "{\"name\":\"$REPO_NAME\",\"private\":$PRIVATE,\"description\":\"[Description from PRD]\"}"
+
+# Add remote
+git remote add origin "https://github.com/$GITHUB_USERNAME/$REPO_NAME.git"
 ```
+
+Check if creation was successful by verifying the response contains the repository URL.
 
 ### Step 9: Initial Commit
 
@@ -389,24 +410,43 @@ git commit -m "chore: initialize project structure with ProdKit
 
 Ask the user if they want to set up branch protection for `main`:
 
-If yes:
+If yes, use GitHub API:
+
 ```bash
-gh api repos/{owner}/{repo}/branches/main/protection \
-  --method PUT \
-  --field required_status_checks='{"strict":true,"contexts":["test"]}' \
-  --field enforce_admins=true \
-  --field required_pull_request_reviews='{"required_approving_review_count":1}'
+# Set up branch protection
+curl -X PUT \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  "https://api.github.com/repos/$GITHUB_USERNAME/$REPO_NAME/branches/main/protection" \
+  -d '{
+    "required_status_checks": {
+      "strict": true,
+      "contexts": ["test"]
+    },
+    "enforce_admins": true,
+    "required_pull_request_reviews": {
+      "required_approving_review_count": 1
+    },
+    "restrictions": null
+  }'
 ```
 
 ### Step 11: Create Milestones
 
-Create the first sprint milestone:
+Create the first sprint milestone using GitHub API:
 
 ```bash
-gh api repos/{owner}/{repo}/milestones \
-  --method POST \
-  --field title='Sprint v1' \
-  --field description='First sprint'
+curl -X POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  "https://api.github.com/repos/$GITHUB_USERNAME/$REPO_NAME/milestones" \
+  -d '{
+    "title": "Sprint v1",
+    "description": "First sprint",
+    "state": "open"
+  }'
 ```
 
 ### Step 12: Update Configuration

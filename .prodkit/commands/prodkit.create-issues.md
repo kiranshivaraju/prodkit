@@ -23,15 +23,13 @@ Read `.prodkit/config.yml` to get:
 - GitHub repo name
 - Label definitions
 
-### Step 2: Verify GitHub CLI
+### Step 2: Get GitHub Credentials
 
-Check that `gh` is installed and authenticated:
+Read `.prodkit/config.yml` to get the GitHub repository information.
 
-```bash
-gh auth status
-```
+Ask the user for their GitHub Personal Access Token (PAT) if not already stored.
 
-If not authenticated, instruct user to run: `gh auth login`
+The token needs the `repo` scope to create issues.
 
 ### Step 3: Read Sprint Tech Docs
 
@@ -209,19 +207,39 @@ Based on the implementation plan:
 - `refactor` - Code improvements
 - `documentation` - Documentation updates
 
-### Step 7: Create Issues via GitHub CLI
+### Step 7: Create Issues via GitHub API
 
-For each issue, use `gh` CLI:
+For each issue, use the GitHub REST API:
 
 ```bash
-gh issue create \
-  --title "[P0][infrastructure] Create database migrations for User table" \
-  --body "$(cat issue_body.md)" \
-  --label "P0,infrastructure" \
-  --milestone "Sprint v{N}"
+# Get the milestone number for "Sprint v{N}"
+MILESTONE_RESPONSE=$(curl -s \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  "https://api.github.com/repos/$GITHUB_USERNAME/$REPO_NAME/milestones")
+
+MILESTONE_NUMBER=$(echo "$MILESTONE_RESPONSE" | jq -r '.[] | select(.title == "Sprint v{N}") | .number')
+
+# Create the issue
+ISSUE_BODY="[Full issue description from template]"
+
+curl -X POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  "https://api.github.com/repos/$GITHUB_USERNAME/$REPO_NAME/issues" \
+  -d "{
+    \"title\": \"[P0][infrastructure] Create database migrations for User table\",
+    \"body\": \"$ISSUE_BODY\",
+    \"labels\": [\"P0\", \"infrastructure\"],
+    \"milestone\": $MILESTONE_NUMBER
+  }"
 ```
 
 Create issues in dependency order (foundational issues first).
+
+**Note:** Store each created issue number for later reference.
 
 ### Step 8: Track Created Issues
 
@@ -251,10 +269,18 @@ Example:
 
 ### Step 9: Link Dependencies
 
-For issues with dependencies, add comments linking them:
+For issues with dependencies, add comments linking them using GitHub API:
 
 ```bash
-gh issue comment {issue_number} --body "⚠️ **Depends on:** #1, #2"
+ISSUE_NUMBER="[issue number]"
+COMMENT_BODY="⚠️ **Depends on:** #1, #2"
+
+curl -X POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  "https://api.github.com/repos/$GITHUB_USERNAME/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
+  -d "{\"body\": \"$COMMENT_BODY\"}"
 ```
 
 ### Step 10: Save Issue Summary
@@ -303,7 +329,15 @@ Based on dependencies:
 
 All issues assigned to: **Sprint v{N}**
 
-View: `gh issue list --milestone "Sprint v{N}"`
+View issues:
+```bash
+# List all issues in the milestone
+curl -s \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  "https://api.github.com/repos/$GITHUB_USERNAME/$REPO_NAME/issues?milestone=$MILESTONE_NUMBER&state=all"
+```
 ```
 
 ### Step 11: Confirm Completion
@@ -316,9 +350,14 @@ Inform the user:
 - Summary saved to `sprints/v{N}/issues-summary.md`
 - Next step: Run `/prodkit.dev` to start implementing issues
 
-Display the issue summary and the command to view issues:
+Display the issue summary. Users can view issues on GitHub or via API:
 ```bash
-gh issue list --milestone "Sprint v{N}" --state open
+# View open issues in Sprint v{N}
+curl -s \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  "https://api.github.com/repos/$GITHUB_USERNAME/$REPO_NAME/issues?milestone=$MILESTONE_NUMBER&state=open" \
+  | jq '.[] | {number, title, labels: [.labels[].name]}'
 ```
 
 ## Important Guidelines

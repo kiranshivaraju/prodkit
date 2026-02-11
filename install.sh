@@ -51,14 +51,14 @@ mkdir -p "$TARGET_DIR/.claude/commands"
 cd "$TARGET_DIR/.claude/commands"
 
 echo "→ Creating command symlinks..."
-ln -sf ../../.prodkit/commands/prd.md prd.md
-ln -sf ../../.prodkit/commands/product-arch.md product-arch.md
-ln -sf ../../.prodkit/commands/init-repo.md init-repo.md
-ln -sf ../../.prodkit/commands/plan-sprint.md plan-sprint.md
-ln -sf ../../.prodkit/commands/sprint-tech.md sprint-tech.md
-ln -sf ../../.prodkit/commands/create-issues.md create-issues.md
-ln -sf ../../.prodkit/commands/dev.md dev.md
-ln -sf ../../.prodkit/commands/review.md review.md
+ln -sf ../../.prodkit/commands/prodkit.prd.md prodkit.prd.md
+ln -sf ../../.prodkit/commands/prodkit.product-arch.md prodkit.product-arch.md
+ln -sf ../../.prodkit/commands/prodkit.init-repo.md prodkit.init-repo.md
+ln -sf ../../.prodkit/commands/prodkit.plan-sprint.md prodkit.plan-sprint.md
+ln -sf ../../.prodkit/commands/prodkit.sprint-tech.md prodkit.sprint-tech.md
+ln -sf ../../.prodkit/commands/prodkit.create-issues.md prodkit.create-issues.md
+ln -sf ../../.prodkit/commands/prodkit.dev.md prodkit.dev.md
+ln -sf ../../.prodkit/commands/prodkit.review.md prodkit.review.md
 
 cd "$TARGET_DIR"
 
@@ -92,19 +92,19 @@ echo "  ✅ ProdKit installed successfully!"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo "Available commands:"
-echo "  /prd            - Create Product Requirements Document"
-echo "  /product-arch   - Define system architecture"
-echo "  /init-repo      - Initialize GitHub repository"
-echo "  /plan-sprint    - Plan sprint features"
-echo "  /sprint-tech    - Create sprint technical docs"
-echo "  /create-issues  - Generate GitHub Issues"
-echo "  /dev            - Implement one issue with TDD"
-echo "  /review         - Generate sprint retrospective"
+echo "  /prodkit.prd            - Create Product Requirements Document"
+echo "  /prodkit.product-arch   - Define system architecture"
+echo "  /prodkit.init-repo      - Initialize GitHub repository"
+echo "  /prodkit.plan-sprint    - Plan sprint features"
+echo "  /prodkit.sprint-tech    - Create sprint technical docs"
+echo "  /prodkit.create-issues  - Generate GitHub Issues"
+echo "  /prodkit.dev            - Implement one issue with TDD"
+echo "  /prodkit.review         - Generate sprint retrospective"
 echo ""
 echo "Next steps:"
 echo "  1. cd $TARGET_DIR"
 echo "  2. Open in Claude Code"
-echo "  3. Run: /prd"
+echo "  3. Run: /prodkit.prd"
 echo ""
 echo "📖 Documentation: See README.md"
 echo ""

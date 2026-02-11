@@ -9,32 +9,32 @@ Before you start, make sure you have:
 - ✅ Claude Code installed
 - ✅ GitHub CLI (`gh`) installed and authenticated
 - ✅ Git installed
-- ✅ Speckit installed (optional, but recommended for `/dev` command)
+- ✅ Speckit installed (optional, but recommended for `/prodkit.dev` command)
 
 ## Installation
 
-### 1. Clone ProdKit
+### Quick Install (One Command)
 
 ```bash
-git clone https://github.com/yourusername/prodkit.git
+# Create your project directory
+mkdir my-new-product
+cd my-new-product
+
+# Install ProdKit directly from GitHub
+curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/prodkit/main/install-remote.sh | bash -s .
 ```
 
-### 2. Install into Your Project
+**Or** if you prefer to clone first:
 
 ```bash
+git clone https://github.com/YOUR_USERNAME/prodkit.git
 cd prodkit
 ./install.sh /path/to/your/project
 ```
 
-Or if you're starting a new project:
+> Replace `YOUR_USERNAME` with the actual GitHub username
 
-```bash
-mkdir my-new-project
-cd my-new-project
-/path/to/prodkit/install.sh .
-```
-
-### 3. Open in Claude Code
+### Open in Claude Code
 
 ```bash
 cd my-new-project
@@ -48,7 +48,7 @@ claude-code .
 In Claude Code, type:
 
 ```
-/prd
+/prodkit.prd
 ```
 
 Answer Claude's questions about your product:
@@ -56,12 +56,12 @@ Answer Claude's questions about your product:
 - Who are the users?
 - What are the main features?
 
-**Output:** `product/prd.md`
+**Output:** `product/prodkit.prd.md`
 
 ### Step 2: Define Architecture (10 minutes)
 
 ```
-/product-arch
+/prodkit.product-arch
 ```
 
 Choose your tech stack:
@@ -74,7 +74,7 @@ Choose your tech stack:
 ### Step 3: Initialize Repository (5 minutes)
 
 ```
-/init-repo
+/prodkit.init-repo
 ```
 
 This sets up:
@@ -88,7 +88,7 @@ This sets up:
 ### Step 4: Plan First Sprint (10 minutes)
 
 ```
-/plan-sprint
+/prodkit.plan-sprint
 ```
 
 Select 2-4 features from your PRD to build first.
@@ -100,7 +100,7 @@ Recommendation: Start with authentication and core models.
 ### Step 5: Create Technical Specs (15 minutes)
 
 ```
-/sprint-tech
+/prodkit.sprint-tech
 ```
 
 Claude will create detailed technical documentation:
@@ -114,7 +114,7 @@ Claude will create detailed technical documentation:
 ### Step 6: Generate GitHub Issues (5 minutes)
 
 ```
-/create-issues
+/prodkit.create-issues
 ```
 
 Converts tech docs into GitHub Issues.
@@ -124,7 +124,7 @@ Converts tech docs into GitHub Issues.
 ### Step 7: Start Development (30 minutes per issue)
 
 ```
-/dev
+/prodkit.dev
 ```
 
 This command:
@@ -137,9 +137,9 @@ This command:
 Run repeatedly until all issues are done:
 
 ```
-/dev
-/dev
-/dev
+/prodkit.dev
+/prodkit.dev
+/prodkit.dev
 ... (repeat)
 ```
 
@@ -148,7 +148,7 @@ Run repeatedly until all issues are done:
 When sprint is complete:
 
 ```
-/review
+/prodkit.review
 ```
 
 Generates comprehensive sprint retrospective.
@@ -161,14 +161,14 @@ Building a simple auth + CRUD app:
 
 | Day | Activity | Command | Time |
 |-----|----------|---------|------|
-| 1 | Define product | `/prd` | 1 hour |
-| 1 | Architecture | `/product-arch` | 1 hour |
-| 1 | Setup repo | `/init-repo` | 30 min |
-| 2 | Plan sprint | `/plan-sprint` | 1 hour |
-| 2 | Tech specs | `/sprint-tech` | 2 hours |
-| 2 | Create issues | `/create-issues` | 30 min |
-| 3-5 | Development | `/dev` (x15) | 3 days |
-| 5 | Sprint review | `/review` | 1 hour |
+| 1 | Define product | `/prodkit.prd` | 1 hour |
+| 1 | Architecture | `/prodkit.product-arch` | 1 hour |
+| 1 | Setup repo | `/prodkit.init-repo` | 30 min |
+| 2 | Plan sprint | `/prodkit.plan-sprint` | 1 hour |
+| 2 | Tech specs | `/prodkit.sprint-tech` | 2 hours |
+| 2 | Create issues | `/prodkit.create-issues` | 30 min |
+| 3-5 | Development | `/prodkit.dev` (x15) | 3 days |
+| 5 | Sprint review | `/prodkit.review` | 1 hour |
 
 **Total:** ~5 days to first working product
 
@@ -188,7 +188,7 @@ Building a simple auth + CRUD app:
 
 ### Development
 
-- **Run /dev in batches** - Do 3-5 issues, then review
+- **Run /prodkit.dev in batches** - Do 3-5 issues, then review
 - **Review PRs manually** - Don't auto-merge everything
 - **Test coverage matters** - Aim for 80%+
 
@@ -232,11 +232,11 @@ Bad Sprint v1 features:
 After your first sprint:
 
 1. Review what worked and what didn't
-2. Plan Sprint v2 with `/plan-sprint`
+2. Plan Sprint v2 with `/prodkit.plan-sprint`
 3. Repeat the process
 
 Each sprint gets faster as you learn the workflow!
 
 ---
 
-**Ready?** Run `/prd` and start building! 🚀
+**Ready?** Run `/prodkit.prd` and start building! 🚀

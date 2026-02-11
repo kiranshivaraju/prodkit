@@ -272,10 +272,26 @@ gh release create v1.1.0 --title "v1.1.0" --notes "Release notes here"
 
 **Congratulations!** ProdKit is now live on GitHub. 🎉
 
-Users can now install it with:
+## How Users Will Install ProdKit
+
+Users can now install ProdKit in multiple ways:
+
+### Method 1: One-Line Install (Recommended)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/prodkit/main/install-remote.sh | bash -s /path/to/project
+```
+
+### Method 2: Clone and Install
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/prodkit.git
 cd prodkit
 ./install.sh /path/to/project
 ```
+
+### Method 3: Manual Install
+
+See README.md for manual installation instructions.
+
+**Remember to update `YOUR_USERNAME` in README.md and QUICKSTART.md with your actual GitHub username!**

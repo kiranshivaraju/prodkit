@@ -31,18 +31,46 @@ Read `.prodkit/config.yml` to get:
 
 ### Step 2: Fetch Highest Priority Issue
 
-Query GitHub for open issues in the current sprint milestone:
+Get GitHub credentials from user (PAT) and repository info from config.
+
+Query GitHub API for open issues in the current sprint milestone:
 
 ```bash
-gh issue list \
-  --milestone "Sprint v{N}" \
-  --state open \
-  --label "P0" \
-  --json number,title,body,labels \
-  --limit 1
-```
+# Get milestone number for Sprint v{N}
+MILESTONE_RESPONSE=$(curl -s \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  "https://api.github.com/repos/$GITHUB_USERNAME/$REPO_NAME/milestones")
 
-If no P0 issues, try P1, then P2.
+MILESTONE_NUMBER=$(echo "$MILESTONE_RESPONSE" | jq -r '.[] | select(.title == "Sprint v{N}") | .number')
+
+# Fetch P0 issues first
+ISSUE_RESPONSE=$(curl -s \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  "https://api.github.com/repos/$GITHUB_USERNAME/$REPO_NAME/issues?milestone=$MILESTONE_NUMBER&state=open&labels=P0&per_page=1")
+
+# If no P0, try P1
+if [ "$(echo "$ISSUE_RESPONSE" | jq '. | length')" -eq 0 ]; then
+  ISSUE_RESPONSE=$(curl -s \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer $GITHUB_TOKEN" \
+    "https://api.github.com/repos/$GITHUB_USERNAME/$REPO_NAME/issues?milestone=$MILESTONE_NUMBER&state=open&labels=P1&per_page=1")
+fi
+
+# If no P1, try P2
+if [ "$(echo "$ISSUE_RESPONSE" | jq '. | length')" -eq 0 ]; then
+  ISSUE_RESPONSE=$(curl -s \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer $GITHUB_TOKEN" \
+    "https://api.github.com/repos/$GITHUB_USERNAME/$REPO_NAME/issues?milestone=$MILESTONE_NUMBER&state=open&labels=P2&per_page=1")
+fi
+
+# Extract issue details
+ISSUE_NUMBER=$(echo "$ISSUE_RESPONSE" | jq -r '.[0].number')
+ISSUE_TITLE=$(echo "$ISSUE_RESPONSE" | jq -r '.[0].title')
+ISSUE_BODY=$(echo "$ISSUE_RESPONSE" | jq -r '.[0].body')
+```
 
 If no open issues found:
 ```
@@ -209,15 +237,13 @@ EOF
 
 ### Step 9: Create Pull Request
 
-Create a PR using `gh` CLI:
+Create a PR using GitHub API:
 
 ```bash
-gh pr create \
-  --title "{issue title}" \
-  --body "$(cat <<'EOF'
-## Summary
+PR_TITLE="{issue title}"
+PR_BODY="## Summary
 
-Implements #{issue-number}: {issue title}
+Implements #${ISSUE_NUMBER}: ${ISSUE_TITLE}
 
 ## Changes
 
@@ -254,32 +280,50 @@ Implements #{issue-number}: {issue title}
 
 ## References
 
-- Issue: #{issue-number}
+- Issue: #${ISSUE_NUMBER}
 - Sprint: v{N}
 - Sprint Plan: sprints/v{N}/sprint-plan.md
 - Tech Docs: sprints/v{N}/tech-docs/
 
 ---
 
-🤖 Generated with ProdKit + Speckit
-EOF
-)" \
-  --head feature/issue-{number}-{slug} \
-  --base main
+🤖 Generated with ProdKit + Speckit"
+
+# Create PR via GitHub API
+PR_RESPONSE=$(curl -X POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  "https://api.github.com/repos/$GITHUB_USERNAME/$REPO_NAME/pulls" \
+  -d "{
+    \"title\": \"$PR_TITLE\",
+    \"body\": \"$PR_BODY\",
+    \"head\": \"feature/issue-${ISSUE_NUMBER}-{slug}\",
+    \"base\": \"main\"
+  }")
+
+PR_NUMBER=$(echo "$PR_RESPONSE" | jq -r '.number')
 ```
 
 ### Step 10: Link PR to Issue
 
 The PR body already includes "Closes #{issue-number}" which will auto-close the issue when merged.
 
-Additionally, add a comment to the issue:
+Additionally, add a comment to the issue using GitHub API:
 
 ```bash
-gh issue comment {issue-number} --body "✓ Implemented in PR #{pr-number}
+COMMENT_BODY="✓ Implemented in PR #${PR_NUMBER}
 
-Branch: \`feature/issue-{number}-{slug}\`
+Branch: \`feature/issue-${ISSUE_NUMBER}-{slug}\`
 
 All tests passing. Ready for review."
+
+curl -X POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  "https://api.github.com/repos/$GITHUB_USERNAME/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
+  -d "{\"body\": \"$COMMENT_BODY\"}"
 ```
 
 ### Step 11: Handle Push Decision
@@ -334,7 +378,7 @@ git checkout main
 
 1. Review the code locally
 2. Push the branch: git push origin feature/issue-{number}-{slug}
-3. Review PR on GitHub: gh pr view {pr-number} --web
+3. Review PR on GitHub: https://github.com/$GITHUB_USERNAME/$REPO_NAME/pull/{pr-number}
 4. Merge the PR after approval
 5. Run /prodkit.dev again to implement the next issue
 
@@ -393,7 +437,7 @@ If no open issues in the current sprint:
 Options:
 1. Run /prodkit.review to generate sprint retrospective
 2. Run /prodkit.plan-sprint to start the next sprint
-3. Check if any PRs need review: gh pr list
+3. Check PRs on GitHub: https://github.com/$GITHUB_USERNAME/$REPO_NAME/pulls
 ```
 
 ## Important Notes
