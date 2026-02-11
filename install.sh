@@ -62,6 +62,61 @@ ln -sf ../../.prodkit/commands/prodkit.review.md prodkit.review.md
 
 cd "$TARGET_DIR"
 
+# Install Speckit for /prodkit.dev workflow
+echo "→ Installing Speckit (required for /prodkit.dev)..."
+
+# Check if Speckit is already installed
+if [ -d "$TARGET_DIR/.speckit" ]; then
+    echo "  ℹ️  Speckit already installed, skipping..."
+else
+    # Clone Speckit to a temp directory
+    TEMP_SPECKIT=$(mktemp -d)
+    if git clone --depth 1 https://github.com/github/spec-kit.git "$TEMP_SPECKIT" 2>/dev/null; then
+        # Copy Speckit's command templates
+        if [ -d "$TEMP_SPECKIT/templates/commands" ]; then
+            echo "  → Setting up Speckit commands..."
+            # Create .speckit directory
+            mkdir -p "$TARGET_DIR/.speckit/commands"
+
+            # Copy Speckit command files with speckit. prefix
+            cd "$TEMP_SPECKIT/templates/commands"
+            for cmd in *.md; do
+                if [ -f "$cmd" ]; then
+                    # Copy with speckit. prefix
+                    cp "$cmd" "$TARGET_DIR/.speckit/commands/speckit.$cmd"
+                fi
+            done
+            cd - > /dev/null
+
+            # Copy Speckit constitution template
+            if [ -f "$TEMP_SPECKIT/templates/constitution-template.md" ]; then
+                mkdir -p "$TARGET_DIR/.speckit"
+                cp "$TEMP_SPECKIT/templates/constitution-template.md" "$TARGET_DIR/.speckit/constitution-template.md"
+            fi
+
+            # Create symlinks in .claude/commands for Speckit commands
+            cd "$TARGET_DIR/.claude/commands"
+            for cmd in "$TARGET_DIR/.speckit/commands/"*.md; do
+                if [ -f "$cmd" ]; then
+                    cmdname=$(basename "$cmd")
+                    ln -sf "../../.speckit/commands/$cmdname" "$cmdname"
+                fi
+            done
+            cd "$TARGET_DIR"
+
+            echo "  ✓ Speckit installed successfully"
+        else
+            echo "  ⚠️  Speckit structure not as expected, you may need to install manually"
+        fi
+
+        # Cleanup
+        rm -rf "$TEMP_SPECKIT"
+    else
+        echo "  ⚠️  Could not download Speckit automatically"
+        echo "  You can install it manually from: https://github.com/github/spec-kit"
+    fi
+fi
+
 # Create placeholder directories
 echo "→ Creating placeholder directories..."
 mkdir -p "$TARGET_DIR/product"
@@ -91,15 +146,21 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "  ✅ ProdKit installed successfully!"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "Available commands:"
+echo "ProdKit commands:"
 echo "  /prodkit.prd            - Create Product Requirements Document"
 echo "  /prodkit.product-arch   - Define system architecture"
 echo "  /prodkit.init-repo      - Initialize GitHub repository"
 echo "  /prodkit.plan-sprint    - Plan sprint features"
 echo "  /prodkit.sprint-tech    - Create sprint technical docs"
 echo "  /prodkit.create-issues  - Generate GitHub Issues"
-echo "  /prodkit.dev            - Implement one issue with TDD"
+echo "  /prodkit.dev            - Implement one issue with TDD (uses Speckit)"
 echo "  /prodkit.review         - Generate sprint retrospective"
+echo ""
+echo "Speckit commands (used by /prodkit.dev):"
+echo "  /speckit.specify        - Define requirements"
+echo "  /speckit.plan           - Create technical plan"
+echo "  /speckit.tasks          - Break into tasks"
+echo "  /speckit.implement      - Implement with TDD"
 echo ""
 echo "Next steps:"
 echo "  1. cd $TARGET_DIR"
