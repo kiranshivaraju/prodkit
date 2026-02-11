@@ -7,8 +7,10 @@ project:
   description: ""
 
 github:
-  repo: ""  # format: username/repo-name
+  username: ""  # Your GitHub username
+  repo: ""      # format: username/repo-name
   default_branch: "main"
+  # Token stored securely in .prodkit/.github-token (not in this file)
 
 dependencies:
   speckit:

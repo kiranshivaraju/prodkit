@@ -128,6 +128,7 @@ if [ ! -f "$TARGET_DIR/.gitignore" ]; then
     cat > "$TARGET_DIR/.gitignore" << 'EOF'
 # ProdKit
 .prodkit/cache/
+.prodkit/.github-token
 
 # OS
 .DS_Store
@@ -139,6 +140,14 @@ Thumbs.db
 *.swp
 *.swo
 EOF
+else
+    # Ensure .prodkit/.github-token is in existing .gitignore
+    if ! grep -q ".prodkit/.github-token" "$TARGET_DIR/.gitignore"; then
+        echo "→ Adding .prodkit/.github-token to .gitignore..."
+        echo "" >> "$TARGET_DIR/.gitignore"
+        echo "# GitHub token (sensitive)" >> "$TARGET_DIR/.gitignore"
+        echo ".prodkit/.github-token" >> "$TARGET_DIR/.gitignore"
+    fi
 fi
 
 echo ""

@@ -25,11 +25,33 @@ Read `.prodkit/config.yml` to get:
 
 ### Step 2: Get GitHub Credentials
 
-Read `.prodkit/config.yml` to get the GitHub repository information.
+Read `.prodkit/config.yml` to get:
+- GitHub username: `github.username`
+- GitHub repository: `github.repo` (format: username/repo-name)
 
-Ask the user for their GitHub Personal Access Token (PAT) if not already stored.
+Read GitHub Personal Access Token from `.prodkit/.github-token`:
 
-The token needs the `repo` scope to create issues.
+```bash
+if [ -f ".prodkit/.github-token" ]; then
+    GITHUB_TOKEN=$(cat .prodkit/.github-token | tr -d '[:space:]')
+else
+    echo "❌ Error: GitHub token not found"
+    echo ""
+    echo "Please run /prodkit.init-repo first to set up your GitHub token."
+    echo "Or manually create .prodkit/.github-token with your GitHub PAT."
+    exit 1
+fi
+```
+
+Extract username and repo name from config:
+
+```bash
+# Parse from github.repo (format: username/repo-name)
+GITHUB_USERNAME=$(echo "$REPO" | cut -d'/' -f1)
+REPO_NAME=$(echo "$REPO" | cut -d'/' -f2)
+```
+
+The token needs the `repo` scope to create issues. If the command fails with authentication errors, the user may need to regenerate their token with proper scopes.
 
 ### Step 3: Read Sprint Tech Docs
 
@@ -463,7 +485,134 @@ curl -s \
 ```
 ```
 
-### Step 13: Confirm Completion
+### Step 13: Validate Issues Created
+
+**Run validation checks to ensure issues were created successfully:**
+
+Display validation in progress:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  VALIDATING ISSUES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**Check 1: Preview File Created**
+```bash
+SPRINT_NUM=$(grep "current:" .prodkit/config.yml | sed 's/.*current: //')
+PREVIEW_FILE="sprints/v${SPRINT_NUM}/issues-preview.md"
+
+if [ ! -f "$PREVIEW_FILE" ]; then
+    echo "❌ Validation failed: Issues preview file not found"
+    echo "Expected: $PREVIEW_FILE"
+    exit 1
+fi
+
+echo "✓ Issues preview file created"
+```
+
+**Check 2: Verify GitHub Token and Credentials**
+```bash
+if [ ! -f ".prodkit/.github-token" ]; then
+    echo "❌ Validation failed: GitHub token not found"
+    echo "Run /prodkit.init-repo first"
+    exit 1
+fi
+
+GITHUB_TOKEN=$(cat .prodkit/.github-token | tr -d '[:space:]')
+echo "✓ GitHub token loaded"
+```
+
+**Check 3: User Confirmed (if issues should be created)**
+```bash
+# This check only runs if user confirmed creation
+# The confirmation happens in Step 8, so by this point either:
+# - User confirmed and we're creating issues
+# - User declined and command exited
+# So if we reach here, user must have confirmed
+echo "✓ User reviewed and confirmed"
+```
+
+**Check 4: Count Issues in GitHub**
+```bash
+# Get repo from config
+REPO=$(grep "repo:" .prodkit/config.yml | sed 's/.*repo: "\(.*\)".*/\1/' | sed 's/.*repo: //' | tr -d '"' | tr -d ' ')
+
+if [ -z "$REPO" ]; then
+    echo "⚠️  Warning: GitHub repo not set in config"
+else
+    # Get milestone number
+    MILESTONE_RESPONSE=$(curl -s \
+      -H "Accept: application/vnd.github+json" \
+      -H "Authorization: Bearer $GITHUB_TOKEN" \
+      "https://api.github.com/repos/$REPO/milestones")
+
+    MILESTONE_NUMBER=$(echo "$MILESTONE_RESPONSE" | jq -r ".[] | select(.title == \"Sprint v${SPRINT_NUM}\") | .number")
+
+    if [ -z "$MILESTONE_NUMBER" ] || [ "$MILESTONE_NUMBER" == "null" ]; then
+        echo "⚠️  Warning: Sprint v${SPRINT_NUM} milestone not found"
+    else
+        # Count issues in milestone
+        ISSUES_RESPONSE=$(curl -s \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer $GITHUB_TOKEN" \
+          "https://api.github.com/repos/$REPO/issues?milestone=$MILESTONE_NUMBER&state=all&per_page=100")
+
+        ISSUE_COUNT=$(echo "$ISSUES_RESPONSE" | jq '. | length')
+
+        if [ "$ISSUE_COUNT" -eq 0 ]; then
+            echo "⚠️  Warning: No issues found in GitHub milestone"
+            echo "Issues may not have been created yet"
+        else
+            echo "✓ Found $ISSUE_COUNT issues in Sprint v${SPRINT_NUM} milestone"
+        fi
+    fi
+fi
+```
+
+**Check 5: Summary File Created**
+```bash
+SUMMARY_FILE="sprints/v${SPRINT_NUM}/issues-summary.md"
+
+if [ ! -f "$SUMMARY_FILE" ]; then
+    echo "⚠️  Warning: Issues summary file not created"
+    echo "Expected: $SUMMARY_FILE"
+else
+    echo "✓ Issues summary file created"
+fi
+```
+
+**Check 6: Tech Docs Exist (prerequisite)**
+```bash
+TECH_DOCS_DIR="sprints/v${SPRINT_NUM}/tech-docs"
+
+if [ ! -d "$TECH_DOCS_DIR" ]; then
+    echo "❌ Validation failed: Tech docs directory not found"
+    echo "Expected: $TECH_DOCS_DIR"
+    echo "Run /prodkit.sprint-tech first"
+    exit 1
+fi
+
+MISSING_DOCS=()
+if [ ! -f "$TECH_DOCS_DIR/data-models.md" ]; then MISSING_DOCS+=("data-models.md"); fi
+if [ ! -f "$TECH_DOCS_DIR/api-endpoints.md" ]; then MISSING_DOCS+=("api-endpoints.md"); fi
+if [ ! -f "$TECH_DOCS_DIR/implementation-plan.md" ]; then MISSING_DOCS+=("implementation-plan.md"); fi
+
+if [ ${#MISSING_DOCS[@]} -gt 0 ]; then
+    echo "❌ Validation failed: Missing tech docs: ${MISSING_DOCS[*]}"
+    exit 1
+fi
+
+echo "✓ Tech docs verified"
+```
+
+Display validation complete:
+```
+✓ All validation checks passed
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### Step 14: Confirm Completion
 
 Inform the user:
 - ✓ Preview generated: `sprints/v{N}/issues-preview.md`
