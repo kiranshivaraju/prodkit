@@ -21,6 +21,12 @@ development:
   workflow: "speckit"  # Use Speckit for /prodkit.dev
   auto_push: false     # Manual review before pushing
 
+code_review:
+  enabled: true              # Enable AI code review in /prodkit.dev
+  block_on_security: true    # Block PR creation if security issues found
+  block_on_quality: false    # Quality issues are warnings only
+  auto_fix_simple: false     # Future: auto-fix simple issues (not implemented yet)
+
 testing:
   framework: "pytest"  # pytest, jest, go test, cargo test, etc.
   min_coverage: 80

@@ -58,6 +58,7 @@ ln -sf ../../.prodkit/commands/prodkit.plan-sprint.md prodkit.plan-sprint.md
 ln -sf ../../.prodkit/commands/prodkit.sprint-tech.md prodkit.sprint-tech.md
 ln -sf ../../.prodkit/commands/prodkit.create-issues.md prodkit.create-issues.md
 ln -sf ../../.prodkit/commands/prodkit.dev.md prodkit.dev.md
+ln -sf ../../.prodkit/commands/prodkit.code-review.md prodkit.code-review.md
 ln -sf ../../.prodkit/commands/prodkit.review.md prodkit.review.md
 
 cd "$TARGET_DIR"
@@ -163,6 +164,7 @@ echo "  /prodkit.plan-sprint    - Plan sprint features"
 echo "  /prodkit.sprint-tech    - Create sprint technical docs"
 echo "  /prodkit.create-issues  - Generate GitHub Issues"
 echo "  /prodkit.dev            - Implement one issue with TDD (uses Speckit)"
+echo "  /prodkit.code-review    - AI code review for branches/PRs"
 echo "  /prodkit.review         - Generate sprint retrospective"
 echo ""
 echo "Speckit commands (used by /prodkit.dev):"

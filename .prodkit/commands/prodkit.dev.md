@@ -235,7 +235,107 @@ flake8 src tests --max-line-length=100
 
 Fix any linting errors.
 
-### Step 8: Commit Changes
+### Step 8: AI Code Review
+
+**Run AI-powered code review before creating PR:**
+
+Check if code review is enabled in config:
+
+```bash
+REVIEW_ENABLED=$(grep "enabled:" .prodkit/config.yml | grep "code_review" -A1 | tail -1 | sed 's/.*enabled: //' | tr -d ' ')
+
+if [ "$REVIEW_ENABLED" = "false" ]; then
+    echo "Code review disabled in config, skipping..."
+else
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "  AI CODE REVIEW"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+fi
+```
+
+**Get the diff to review:**
+
+```bash
+# Get diff from main branch
+DIFF=$(git diff main...HEAD)
+FILES_CHANGED=$(git diff --name-only main...HEAD)
+STATS=$(git diff --stat main...HEAD)
+
+echo "Analyzing changes..."
+echo "$STATS"
+echo ""
+```
+
+**Analyze code changes:**
+
+Use Claude to analyze the diff against:
+
+1. **Design Principles** (from `product/tech-docs/design-principles.md`)
+2. **Security Guidelines** (from `product/tech-docs/security.md`)
+3. **Code Quality Standards**
+
+**Review Criteria:**
+
+🔴 **BLOCKING ISSUES** (must fix before PR):
+- Hardcoded secrets/credentials
+- SQL injection vulnerabilities
+- XSS vulnerabilities
+- Authentication bypass
+- Missing critical input validation
+- Exposed sensitive data
+
+🟡 **WARNINGS** (should fix, can override):
+- Code duplication (DRY violations)
+- Missing error handling
+- Performance concerns (N+1 queries, inefficient loops)
+- Missing documentation on complex logic
+- Design pattern violations
+- Incomplete test coverage for edge cases
+
+✅ **QUALITY CHECKS**:
+- Follows design principles from product docs
+- Proper naming conventions
+- Functions are focused and small
+- No obvious bugs
+- Tests cover main functionality
+
+**Present findings to user:**
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+REVIEW FINDINGS:
+
+{List of issues found, categorized by severity}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**User decision:**
+
+Use AskUserQuestion tool to ask:
+
+- **Question:** "Code review found {X} blocking issues and {Y} warnings. What would you like to do?"
+- **Options:**
+  1. "Fix issues now" → User manually edits code, then re-run Step 8
+  2. "Override warnings and continue" → Add warnings to PR description, proceed
+  3. "Cancel /prodkit.dev" → Exit command
+
+**If blocking issues found:**
+- User MUST choose "Fix issues now" or "Cancel"
+- Cannot proceed to PR with blocking security issues
+
+**If only warnings:**
+- User can choose to fix or override
+- If override: warnings documented in PR body
+
+**After review passes or is overridden:**
+- Continue to Step 9
+
+---
+
+### Step 9: Commit Changes
 
 Create a commit with a conventional commit message:
 
@@ -259,7 +359,7 @@ EOF
 )"
 ```
 
-### Step 9: Create Pull Request
+### Step 10: Create Pull Request
 
 Create a PR using GitHub API:
 
@@ -329,7 +429,7 @@ PR_RESPONSE=$(curl -X POST \
 PR_NUMBER=$(echo "$PR_RESPONSE" | jq -r '.number')
 ```
 
-### Step 10: Link PR to Issue
+### Step 11: Link PR to Issue
 
 The PR body already includes "Closes #{issue-number}" which will auto-close the issue when merged.
 
@@ -350,7 +450,7 @@ curl -X POST \
   -d "{\"body\": \"$COMMENT_BODY\"}"
 ```
 
-### Step 11: Handle Push Decision
+### Step 12: Handle Push Decision
 
 Check `.prodkit/config.yml` for `development.auto_push`:
 
@@ -387,13 +487,13 @@ Then display:
 ✓ PR #{pr-number} ready for review
 ```
 
-### Step 12: Return to Main Branch
+### Step 13: Return to Main Branch
 
 ```bash
 git checkout main
 ```
 
-### Step 13: Validate Implementation
+### Step 14: Validate Implementation
 
 **Run validation checks to ensure implementation completed successfully:**
 
@@ -535,7 +635,7 @@ Display validation complete:
 
 **If any critical checks fail, display error and exit. Warnings can continue.**
 
-### Step 14: Display Next Steps
+### Step 15: Display Next Steps
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
