@@ -128,10 +128,96 @@ This is a PRODUCT-LEVEL document (not sprint-level). It contains ALL features fo
    - Set `project.name` to the product name
    - Set `project.description` to a brief description
 
-4. **Confirm Completion**
+4. **Validate PRD Created**
 
-   After creating the PRD, inform the user:
-   - PRD created at `product/prd.md`
+   Run validation checks to ensure PRD was created successfully:
+
+   Display validation in progress:
+   ```
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     VALIDATING PRD
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ```
+
+   **Check 1: PRD File Exists**
+   ```bash
+   PRD_FILE="product/prd.md"
+
+   if [ ! -f "$PRD_FILE" ]; then
+       echo "❌ Validation failed: PRD file not found"
+       echo "Expected: $PRD_FILE"
+       exit 1
+   fi
+
+   echo "✓ PRD file exists"
+   ```
+
+   **Check 2: PRD Has Content**
+   ```bash
+   if [ ! -s "$PRD_FILE" ]; then
+       echo "❌ Validation failed: PRD file is empty"
+       exit 1
+   fi
+
+   echo "✓ PRD has content"
+   ```
+
+   **Check 3: PRD Has Required Sections**
+   ```bash
+   MISSING_SECTIONS=()
+
+   if ! grep -q "## Product Overview" "$PRD_FILE"; then MISSING_SECTIONS+=("Product Overview"); fi
+   if ! grep -q "## Features" "$PRD_FILE"; then MISSING_SECTIONS+=("Features"); fi
+   if ! grep -q "## User Stories" "$PRD_FILE"; then MISSING_SECTIONS+=("User Stories"); fi
+   if ! grep -q "## Success Metrics" "$PRD_FILE"; then MISSING_SECTIONS+=("Success Metrics"); fi
+
+   if [ ${#MISSING_SECTIONS[@]} -gt 0 ]; then
+       echo "❌ Validation failed: PRD missing required sections: ${MISSING_SECTIONS[*]}"
+       exit 1
+   fi
+
+   echo "✓ PRD has all required sections"
+   ```
+
+   **Check 4: Features Defined**
+   ```bash
+   FEATURE_COUNT=$(grep -c "^### Feature" "$PRD_FILE" || echo "0")
+
+   if [ "$FEATURE_COUNT" -lt 1 ]; then
+       echo "⚠️  Warning: No features defined in PRD"
+       echo "At least one feature should be defined under ## Features section"
+   else
+       echo "✓ PRD has $FEATURE_COUNT feature(s) defined"
+   fi
+   ```
+
+   **Check 5: Config Updated**
+   ```bash
+   if [ ! -f ".prodkit/config.yml" ]; then
+       echo "⚠️  Warning: Config file not found"
+   else
+       PROJECT_NAME=$(grep "name:" .prodkit/config.yml | head -1 | sed 's/.*name: "\(.*\)".*/\1/' | sed 's/.*name: //' | tr -d '"')
+
+       if [ "$PROJECT_NAME" = "my-project" ] || [ -z "$PROJECT_NAME" ]; then
+           echo "⚠️  Warning: Project name not updated in config.yml"
+       else
+           echo "✓ Config updated with project name: $PROJECT_NAME"
+       fi
+   fi
+   ```
+
+   Display validation complete:
+   ```
+   ✓ All validation checks passed
+
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ```
+
+5. **Confirm Completion**
+
+   After creating and validating the PRD, inform the user:
+   - ✓ PRD created at `product/prd.md`
+   - ✓ PRD validated with {X} features defined
    - Total number of features defined
    - Next step: Run `/prodkit.product-arch` to define the technical architecture
 

@@ -330,6 +330,46 @@ Use AskUserQuestion tool to ask:
 - User can choose to fix or override
 - If override: warnings documented in PR body
 
+**Save code review results for validation:**
+
+After user decision, create state file to track review completion:
+
+```bash
+# Create .prodkit/.state directory if it doesn't exist
+mkdir -p .prodkit/.state
+
+# Save review results
+cat > .prodkit/.state/code-review-latest.json << EOF
+{
+  "completed": true,
+  "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "branch": "$(git branch --show-current)",
+  "blocking_count": ${BLOCKING_COUNT:-0},
+  "warning_count": ${WARNING_COUNT:-0},
+  "user_decision": "${USER_DECISION}",
+  "status": "complete"
+}
+EOF
+
+echo "→ Code review state saved to .prodkit/.state/code-review-latest.json"
+```
+
+**If user chose "Fix issues now":**
+- Mark review as incomplete in state file:
+```bash
+jq '.status = "incomplete" | .completed = false' .prodkit/.state/code-review-latest.json > tmp.json && mv tmp.json .prodkit/.state/code-review-latest.json
+```
+- User edits code to fix issues
+- After fixes, re-run from Step 8 (code review will run again)
+
+**If user chose "Override" OR no blocking issues:**
+- State file already marked as complete
+- Continue to Step 9
+
+**If user chose "Cancel":**
+- Exit command
+- State file shows review was incomplete
+
 **After review passes or is overridden:**
 - Continue to Step 9
 
@@ -536,25 +576,116 @@ echo "✓ Found $COMMIT_COUNT commit(s) on feature branch"
 git checkout main -q
 ```
 
-**Check 3: Tests Were Run (check for test output/artifacts)**
+**Check 3: Code Review Completed**
 ```bash
-# This is a soft check - we verify tests exist and can be run
-# The actual test run would have happened in Step 6
+# Verify code review step (Step 8) was run and passed
 
-if [ -d "tests" ]; then
-    TEST_FILE_COUNT=$(find tests -name "test_*.py" -o -name "*_test.py" -o -name "*.test.js" 2>/dev/null | wc -l | tr -d ' ')
+# Check if code review is enabled
+REVIEW_ENABLED=$(grep -A3 "code_review:" .prodkit/config.yml 2>/dev/null | grep "enabled:" | sed 's/.*enabled: //' | tr -d ' ')
 
-    if [ "$TEST_FILE_COUNT" -eq 0 ]; then
-        echo "⚠️  Warning: No test files found in tests/ directory"
+if [ "$REVIEW_ENABLED" = "true" ]; then
+    # Check for code review state file
+    if [ -f ".prodkit/.state/code-review-latest.json" ]; then
+        # Verify review completed
+        REVIEW_COMPLETED=$(jq -r '.completed // false' .prodkit/.state/code-review-latest.json)
+
+        if [ "$REVIEW_COMPLETED" != "true" ]; then
+            echo "❌ Validation failed: Code review did not complete"
+            echo "State: $(cat .prodkit/.state/code-review-latest.json)"
+            exit 1
+        fi
+
+        # Check for unresolved blocking issues
+        BLOCKING_COUNT=$(jq -r '.blocking_count // 0' .prodkit/.state/code-review-latest.json)
+        USER_DECISION=$(jq -r '.user_decision // "none"' .prodkit/.state/code-review-latest.json)
+
+        if [ "$BLOCKING_COUNT" -gt 0 ] && [ "$USER_DECISION" != "override" ]; then
+            echo "❌ Validation failed: ${BLOCKING_COUNT} blocking issues remain unresolved"
+            echo "Review results: $(cat .prodkit/.state/code-review-latest.json)"
+            exit 1
+        fi
+
+        if [ "$USER_DECISION" = "override" ]; then
+            echo "✓ Code review completed (${BLOCKING_COUNT} issues overridden)"
+        else
+            echo "✓ Code review passed (0 blocking issues)"
+        fi
     else
-        echo "✓ Test files present ($TEST_FILE_COUNT files)"
+        echo "⚠️  Warning: Code review state file not found"
+        echo "Code review may not have run (expected: .prodkit/.state/code-review-latest.json)"
     fi
 else
-    echo "⚠️  Warning: tests/ directory not found"
+    echo "✓ Code review disabled in config"
 fi
 ```
 
-**Check 4: Pull Request Created**
+**Check 4: Re-verify Tests Pass and Coverage**
+```bash
+# Don't just check if test files exist - actually RUN them again
+# This ensures tests still pass after any fixes made during code review
+
+echo "→ Re-running tests to verify..."
+
+# Determine test command based on project type
+PROJECT_TYPE=$(grep "type:" .prodkit/config.yml | sed 's/.*type: "\(.*\)".*/\1/' | sed 's/.*type: //' | tr -d '"' | tr -d ' ')
+
+if [ "$PROJECT_TYPE" = "python" ]; then
+    # Run pytest with coverage
+    if command -v pytest &> /dev/null; then
+        TEST_OUTPUT=$(pytest --cov=src --cov-report=term-missing 2>&1)
+        TEST_EXIT_CODE=$?
+
+        if [ $TEST_EXIT_CODE -ne 0 ]; then
+            echo "❌ Validation failed: Tests are failing"
+            echo "$TEST_OUTPUT"
+            exit 1
+        fi
+
+        # Parse coverage
+        COVERAGE=$(echo "$TEST_OUTPUT" | grep "TOTAL" | awk '{print $NF}' | sed 's/%//')
+        MIN_COVERAGE=$(grep "min_coverage:" .prodkit/config.yml | sed 's/.*min_coverage: //')
+
+        if [ ! -z "$COVERAGE" ] && [ ! -z "$MIN_COVERAGE" ]; then
+            if [ "$COVERAGE" -lt "$MIN_COVERAGE" ]; then
+                echo "❌ Validation failed: Coverage is ${COVERAGE}%, expected >= ${MIN_COVERAGE}%"
+                exit 1
+            fi
+            echo "✓ Tests passing with ${COVERAGE}% coverage"
+        else
+            echo "✓ Tests passing"
+        fi
+    else
+        echo "⚠️  Warning: pytest not found, skipping test verification"
+    fi
+elif [ "$PROJECT_TYPE" = "node" ]; then
+    # Run npm test
+    if command -v npm &> /dev/null; then
+        if npm test; then
+            echo "✓ Tests passing"
+        else
+            echo "❌ Validation failed: Tests are failing"
+            exit 1
+        fi
+    else
+        echo "⚠️  Warning: npm not found, skipping test verification"
+    fi
+else
+    # Generic check - at least verify test files exist
+    if [ -d "tests" ]; then
+        TEST_FILE_COUNT=$(find tests -name "test_*.py" -o -name "*_test.py" -o -name "*.test.js" 2>/dev/null | wc -l | tr -d ' ')
+
+        if [ "$TEST_FILE_COUNT" -eq 0 ]; then
+            echo "⚠️  Warning: No test files found in tests/ directory"
+        else
+            echo "✓ Test files present ($TEST_FILE_COUNT files)"
+        fi
+    else
+        echo "⚠️  Warning: tests/ directory not found"
+    fi
+fi
+```
+
+**Check 5: Pull Request Created**
 ```bash
 # Verify PR was created by checking if PR_NUMBER variable was set
 # In actual execution, we'd have stored this from Step 9
@@ -583,7 +714,7 @@ else
 fi
 ```
 
-**Check 5: Issue Updated**
+**Check 6: Issue Updated**
 ```bash
 # Verify issue was linked/updated
 if [ ! -z "$ISSUE_NUMBER" ] && [ ! -z "$REPO" ] && [ -f ".prodkit/.github-token" ]; then
@@ -614,7 +745,7 @@ else
 fi
 ```
 
-**Check 6: Code Quality**
+**Check 7: Code Quality**
 ```bash
 # Verify implementation meets quality standards
 echo ""
