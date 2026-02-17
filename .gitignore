@@ -1,0 +1,57 @@
+# ProdKit - Framework files should be tracked
+# This .gitignore is for the ProdKit repository itself
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Cache
+.prodkit/cache/
+
+# Don't ignore these (they're part of the framework)
+!.prodkit/
+!.prodkit/config.yml
+!.prodkit/commands/
+
+# Example/test directories that shouldn't be in the framework repo
+product/
+sprints/
+node_modules/
+venv/
+env/
+.env
+.env.local
+
+# Python package build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# But keep our src/ package
+!src/prodkit/

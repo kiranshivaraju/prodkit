@@ -1,0 +1,19 @@
+# Include all ProdKit command files
+recursive-include src/prodkit/.prodkit/commands *.md
+
+# Include config template
+include src/prodkit/.prodkit/config.yml
+
+# Include installation script
+include src/prodkit/install.sh
+
+# Include documentation
+include README.md
+include LICENSE
+include QUICKSTART.md
+include CONTRIBUTING.md
+
+# Exclude Python cache and compiled files
+global-exclude __pycache__
+global-exclude *.py[co]
+global-exclude .DS_Store
