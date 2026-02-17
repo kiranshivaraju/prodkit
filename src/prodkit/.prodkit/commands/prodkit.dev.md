@@ -235,23 +235,16 @@ flake8 src tests --max-line-length=100
 
 Fix any linting errors.
 
-### Step 8: AI Code Review
+**⚠️ DO NOT proceed to creating a PR. You MUST run the code review in Step 8 first.**
 
-**Run AI-powered code review before creating PR:**
+### Step 8: AI Code Review (MANDATORY)
 
-Check if code review is enabled in config:
+**⚠️ CRITICAL: You MUST run code review before creating the PR. Do NOT skip this step.**
 
-```bash
-REVIEW_ENABLED=$(grep "enabled:" .prodkit/config.yml | grep "code_review" -A1 | tail -1 | sed 's/.*enabled: //' | tr -d ' ')
-
-if [ "$REVIEW_ENABLED" = "false" ]; then
-    echo "Code review disabled in config, skipping..."
-else
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "  AI CODE REVIEW"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo ""
-fi
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  AI CODE REVIEW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 **Get the diff to review:**
@@ -400,6 +393,8 @@ EOF
 ```
 
 ### Step 10: Create Pull Request
+
+**⚠️ STOP: Before creating the PR, confirm that Step 8 (AI Code Review) was completed. If it was not, go back and run it now.**
 
 Create a PR using GitHub API:
 
