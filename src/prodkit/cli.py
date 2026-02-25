@@ -7,6 +7,7 @@ import os
 import sys
 import subprocess
 import shutil
+import tempfile
 import platform
 from pathlib import Path
 from typing import Optional
@@ -85,6 +86,123 @@ def check_claude_code() -> bool:
         return True
 
     return False
+
+
+def _create_link(source: Path, link: Path) -> None:
+    """Create a symlink, falling back to copy on Windows if symlinks aren't available."""
+    if link.exists() or link.is_symlink():
+        link.unlink()
+    try:
+        link.symlink_to(os.path.relpath(source, link.parent))
+    except OSError:
+        # Windows without Developer Mode — fall back to copy
+        shutil.copy2(source, link)
+
+
+def install_prodkit(target_dir: Path, force: bool = False) -> None:
+    """Install ProdKit files into the target directory (cross-platform)."""
+    package_dir = Path(__file__).parent
+    source_prodkit = package_dir / ".prodkit"
+
+    if not source_prodkit.exists():
+        console.print(f"[red]Error: Bundled .prodkit directory not found at {source_prodkit}[/red]")
+        sys.exit(1)
+
+    dest_prodkit = target_dir / ".prodkit"
+
+    # Overwrite check
+    if dest_prodkit.exists():
+        if not force:
+            if not Confirm.ask("[yellow]ProdKit is already installed here. Overwrite?[/yellow]", default=False):
+                console.print("[yellow]Installation cancelled[/yellow]")
+                sys.exit(0)
+        shutil.rmtree(dest_prodkit)
+
+    # Copy .prodkit directory
+    console.print("[cyan]→[/cyan] Copying ProdKit configuration and commands...")
+    shutil.copytree(source_prodkit, dest_prodkit)
+
+    # Create .claude/commands and symlinks
+    claude_commands = target_dir / ".claude" / "commands"
+    claude_commands.mkdir(parents=True, exist_ok=True)
+
+    console.print("[cyan]→[/cyan] Setting up Claude Code commands...")
+    for cmd_file in sorted((dest_prodkit / "commands").glob("prodkit.*.md")):
+        _create_link(cmd_file, claude_commands / cmd_file.name)
+
+    # Install Speckit
+    speckit_dir = target_dir / ".speckit"
+    if speckit_dir.exists():
+        console.print("[cyan]→[/cyan] Speckit already installed, skipping...")
+    else:
+        console.print("[cyan]→[/cyan] Installing Speckit...")
+        tmp_dir = tempfile.mkdtemp()
+        try:
+            result = subprocess.run(
+                ["git", "clone", "--depth", "1", "https://github.com/github/spec-kit.git", tmp_dir],
+                capture_output=True, text=True,
+            )
+            templates_commands = Path(tmp_dir) / "templates" / "commands"
+            if result.returncode == 0 and templates_commands.is_dir():
+                speckit_commands = speckit_dir / "commands"
+                speckit_commands.mkdir(parents=True, exist_ok=True)
+
+                for cmd in templates_commands.glob("*.md"):
+                    dest_name = f"speckit.{cmd.name}"
+                    shutil.copy2(cmd, speckit_commands / dest_name)
+                    _create_link(speckit_commands / dest_name, claude_commands / dest_name)
+
+                constitution = Path(tmp_dir) / "templates" / "constitution-template.md"
+                if constitution.exists():
+                    shutil.copy2(constitution, speckit_dir / "constitution-template.md")
+
+                console.print("[green]  ✓[/green] Speckit installed")
+            else:
+                console.print("[yellow]  ⚠[/yellow] Could not download Speckit (install manually from https://github.com/github/spec-kit)")
+        except FileNotFoundError:
+            console.print("[yellow]  ⚠[/yellow] Git not found, skipping Speckit installation")
+        finally:
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    # Create placeholder directories
+    console.print("[cyan]→[/cyan] Creating project directories...")
+    for d in ["product", "sprints", ".prodkit/.state"]:
+        (target_dir / d).mkdir(parents=True, exist_ok=True)
+
+    # Handle .gitignore
+    gitignore = target_dir / ".gitignore"
+    prodkit_entries = {
+        ".prodkit/cache/",
+        ".prodkit/.github-token",
+        ".prodkit/.state/",
+    }
+    if not gitignore.exists():
+        console.print("[cyan]→[/cyan] Creating .gitignore...")
+        gitignore.write_text(
+            "# ProdKit\n"
+            ".prodkit/cache/\n"
+            ".prodkit/.github-token\n"
+            ".prodkit/.state/\n"
+            "\n"
+            "# OS\n"
+            ".DS_Store\n"
+            "Thumbs.db\n"
+            "\n"
+            "# IDEs\n"
+            ".vscode/\n"
+            ".idea/\n"
+            "*.swp\n"
+            "*.swo\n"
+        )
+    else:
+        existing = gitignore.read_text()
+        missing = [e for e in prodkit_entries if e not in existing]
+        if missing:
+            console.print("[cyan]→[/cyan] Updating .gitignore...")
+            with open(gitignore, "a") as f:
+                f.write("\n# ProdKit\n")
+                for entry in missing:
+                    f.write(f"{entry}\n")
 
 
 def get_prodkit_commands_dir() -> Path:
@@ -270,57 +388,25 @@ def init(
     console.print("[bold cyan]Installing ProdKit...[/bold cyan]")
     console.print()
 
-    # Run the install.sh script
-    package_dir = Path(__file__).parent
-    install_script = package_dir / "install.sh"
-
-    if not install_script.exists():
-        console.print(f"[red]✗ Error: install.sh not found at {install_script}[/red]")
-        sys.exit(1)
-
     try:
-        env = os.environ.copy()
-        env["TARGET_DIR"] = str(target_dir)
-        env["PROJECT_NAME"] = project_name
-        env["AI_PLATFORM"] = ai
-        env["TERMINAL_TYPE"] = terminal
-        if force:
-            env["FORCE_INSTALL"] = "1"
-
-        # Use appropriate shell based on detected OS
-        shell_cmd = "bash"
-        if detected_os == "windows" and terminal == "powershell":
-            shell_cmd = "powershell"
-
-        result = subprocess.run(
-            [shell_cmd, str(install_script)],
-            env=env,
-            cwd=str(target_dir),
-            text=True,
-        )
+        install_prodkit(target_dir, force=force)
 
         console.print()
-
-        if result.returncode == 0:
-            console.print(Panel.fit(
-                f"[bold green]✓ ProdKit initialized successfully![/bold green]\n\n"
-                f"[cyan]Project:[/cyan] {project_name}\n"
-                f"[cyan]Location:[/cyan] {target_dir}\n"
-                f"[cyan]AI Platform:[/cyan] {ai}\n"
-                f"[cyan]Terminal:[/cyan] {terminal}\n\n"
-                f"[dim]Next steps:[/dim]\n"
-                f"1. cd {target_dir if not here and project_name != '.' else '.'}\n"
-                f"2. Open in Claude Code\n"
-                f"3. Run /prodkit.prd to start building your product!",
-                title="Installation Complete",
-                border_style="green"
-            ))
-        else:
-            console.print(f"[red]✗ Installation failed with exit code {result.returncode}[/red]")
-            sys.exit(result.returncode)
-
+        console.print(Panel.fit(
+            f"[bold green]✓ ProdKit initialized successfully![/bold green]\n\n"
+            f"[cyan]Project:[/cyan] {project_name}\n"
+            f"[cyan]Location:[/cyan] {target_dir}\n"
+            f"[cyan]AI Platform:[/cyan] {ai}\n"
+            f"[cyan]Terminal:[/cyan] {terminal}\n\n"
+            f"[dim]Next steps:[/dim]\n"
+            f"1. cd {target_dir if not here and project_name != '.' else '.'}\n"
+            f"2. Open in Claude Code\n"
+            f"3. Run /prodkit.prd to start building your product!",
+            title="Installation Complete",
+            border_style="green"
+        ))
     except Exception as e:
-        console.print(f"[red]✗ Error running installation: {e}[/red]")
+        console.print(f"[red]✗ Error during installation: {e}[/red]")
         sys.exit(1)
 
 

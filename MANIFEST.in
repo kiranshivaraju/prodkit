@@ -4,9 +4,6 @@ recursive-include src/prodkit/.prodkit/commands *.md
 # Include config template
 include src/prodkit/.prodkit/config.yml
 
-# Include installation script
-include src/prodkit/install.sh
-
 # Include documentation
 include README.md
 include LICENSE
