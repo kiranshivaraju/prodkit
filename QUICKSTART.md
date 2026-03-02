@@ -42,7 +42,20 @@ Answer Claude's questions about your product:
 
 **Output:** `product/prd.md`
 
-### Step 2: Define Architecture (10 minutes)
+### Step 2: Market Research (10 minutes)
+
+```
+/prodkit.market-research
+```
+
+Claude will research competitors and validate your idea:
+- Identifies existing products solving the same problem
+- Compares features, pricing, and positioning
+- Recommends differentiation strategy
+
+**Output:** `product/market-research.md`
+
+### Step 3: Define Architecture (10 minutes)
 
 ```
 /prodkit.product-arch
@@ -55,7 +68,7 @@ Choose your tech stack:
 
 **Output:** `product/tech-docs/` + `.speckit/constitution.md`
 
-### Step 3: Initialize Repository (5 minutes)
+### Step 4: Initialize Repository (5 minutes)
 
 ```
 /prodkit.init-repo
@@ -69,7 +82,7 @@ This sets up:
 
 **Output:** Complete project structure + GitHub repo
 
-### Step 4: Plan First Sprint (10 minutes)
+### Step 5: Plan First Sprint (10 minutes)
 
 ```
 /prodkit.plan-sprint
@@ -81,7 +94,7 @@ Recommendation: Start with authentication and core models.
 
 **Output:** `sprints/v1/sprint-plan.md`
 
-### Step 5: Create Technical Specs (15 minutes)
+### Step 6: Create Technical Specs (15 minutes)
 
 ```
 /prodkit.sprint-tech
@@ -95,7 +108,7 @@ Claude will create detailed technical documentation:
 
 **Output:** `sprints/v1/tech-docs/`
 
-### Step 6: Generate GitHub Issues (5 minutes)
+### Step 7: Generate GitHub Issues (5 minutes)
 
 ```
 /prodkit.create-issues
@@ -105,7 +118,7 @@ Converts tech docs into GitHub Issues.
 
 **Output:** 10-20 GitHub Issues created
 
-### Step 7: Start Development (30 minutes per issue)
+### Step 8: Start Development (30 minutes per issue)
 
 ```
 /prodkit.dev
@@ -127,7 +140,7 @@ Run repeatedly until all issues are done:
 ... (repeat)
 ```
 
-### Step 8: Sprint Review (10 minutes)
+### Step 9: Sprint Review (10 minutes)
 
 When sprint is complete:
 

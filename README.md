@@ -84,9 +84,10 @@ uv tool upgrade prodkit-cli
 ### One-Time Setup
 
 ```bash
-/prodkit.prd           # Create Product Requirements Document
-/prodkit.product-arch  # Define system architecture
-/prodkit.init-repo     # Initialize GitHub repository
+/prodkit.prd              # Create Product Requirements Document
+/prodkit.market-research  # Research competitors and validate market fit
+/prodkit.product-arch     # Define system architecture
+/prodkit.init-repo        # Initialize GitHub repository
 ```
 
 ### Per Sprint
@@ -109,9 +110,21 @@ uv tool upgrade prodkit-cli
 
 Defines WHAT the product is and WHY it exists. Contains all features, user stories, and success metrics.
 
-**Output:** `product/prodkit.prd.md`
+**Output:** `product/prd.md`
 
 **Run:** Once per product
+
+---
+
+### `/prodkit.market-research`
+
+**Research Competitors and Validate Market Fit**
+
+Reads your PRD and researches existing products that solve the same problem. Generates a competitor analysis, feature comparison matrix, market gap analysis, and differentiation strategy.
+
+**Output:** `product/market-research.md`
+
+**Run:** Once per product (after PRD, before architecture)
 
 ---
 
@@ -291,7 +304,19 @@ You define:
 - Features: Auth, Scraping Engine, Scheduling, API, Dashboard, Export
 - 15 total features identified
 
-### Step 2: Architecture
+### Step 2: Market Research
+
+```bash
+$ /prodkit.market-research
+```
+
+Findings:
+- 5 competitors identified (Scrapy Cloud, Apify, etc.)
+- Key differentiator: built-in scheduling + no-code dashboard
+- Market gap: no good open-source SaaS option
+- Recommendation: prioritize API and scheduling features
+
+### Step 3: Architecture
 
 ```bash
 $ /prodkit.product-arch
@@ -304,7 +329,7 @@ Decisions made:
 - Microservices architecture
 - TDD with pytest
 
-### Step 3: Initialize Repo
+### Step 4: Initialize Repo
 
 ```bash
 $ /prodkit.init-repo
@@ -312,7 +337,7 @@ $ /prodkit.init-repo
 
 Creates project structure and GitHub repo.
 
-### Step 4: Plan Sprint 1
+### Step 5: Plan Sprint 1
 
 ```bash
 $ /prodkit.plan-sprint
@@ -324,7 +349,7 @@ You select:
 
 Sprint goal: "Enable users to authenticate and perform basic web scraping"
 
-### Step 5: Technical Design
+### Step 6: Technical Design
 
 ```bash
 $ /prodkit.sprint-tech
@@ -336,7 +361,7 @@ Creates detailed specs:
 - AuthService, ScraperEngine components
 - Complete implementation plan
 
-### Step 6: Create GitHub Issues
+### Step 7: Create GitHub Issues
 
 ```bash
 $ /prodkit.create-issues
@@ -348,7 +373,7 @@ Creates 18 issues:
 - #3: [P0][unit-test] User model tests
 - ... and 15 more
 
-### Step 7: Development
+### Step 8: Development
 
 ```bash
 $ /prodkit.dev
@@ -368,7 +393,7 @@ Implements Issue #2...
 
 (Repeat 18 times until all issues done)
 
-### Step 8: Sprint Review
+### Step 9: Sprint Review
 
 ```bash
 $ /prodkit.review
@@ -381,7 +406,7 @@ Generates comprehensive review:
 - Code walkthrough
 - Ready for Sprint v2
 
-### Step 9: Sprint 2
+### Step 10: Sprint 2
 
 ```bash
 $ /prodkit.plan-sprint
