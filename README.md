@@ -90,6 +90,12 @@ uv tool upgrade prodkit-cli
 /prodkit.init-repo        # Initialize GitHub repository
 ```
 
+### After Any Document Step (Optional)
+
+```bash
+/prodkit.gap-analysis  # Audit documents for gaps and inconsistencies
+```
+
 ### Per Sprint
 
 ```bash
@@ -125,6 +131,18 @@ Reads your PRD and researches existing products that solve the same problem. Gen
 **Output:** `product/market-research.md`
 
 **Run:** Once per product (after PRD, before architecture)
+
+---
+
+### `/prodkit.gap-analysis`
+
+**Audit Documents for Gaps and Inconsistencies**
+
+Scans all existing ProdKit documents and checks for missing sections, vague descriptions, undefined validation rules, and cross-document inconsistencies. Also verifies user flow traceability — ensuring every workflow in the PRD traces through to API endpoints, data models, components, and test cases.
+
+**Output:** `product/gap-analysis.md`
+
+**Run:** After any document step (optional but recommended)
 
 ---
 
@@ -242,6 +260,8 @@ your-project/
 │   ├── config.yml          # ProdKit configuration
 │   └── commands/           # Slash command definitions
 │       ├── prd.md
+│       ├── market-research.md
+│       ├── gap-analysis.md
 │       ├── product-arch.md
 │       ├── init-repo.md
 │       ├── plan-sprint.md

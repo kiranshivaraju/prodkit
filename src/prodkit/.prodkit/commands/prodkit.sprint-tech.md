@@ -878,6 +878,7 @@ Inform the user:
   - `implementation-plan.md` - [Step-by-step plan]
   - `component-design.md` - [{Z} components designed]
   - `.env.example` - [Environment variables template]
+- Optional: Run `/prodkit.gap-analysis` to check for gaps before creating issues
 - Next step: Run `/prodkit.create-issues` to convert these into GitHub Issues
 
 ## CRITICAL REMINDERS

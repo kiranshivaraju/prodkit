@@ -42,6 +42,8 @@ Answer Claude's questions about your product:
 
 **Output:** `product/prd.md`
 
+> **Tip:** After any document step, you can run `/prodkit.gap-analysis` to audit for missing details and cross-document inconsistencies.
+
 ### Step 2: Market Research (10 minutes)
 
 ```

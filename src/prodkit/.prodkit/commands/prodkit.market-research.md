@@ -227,6 +227,7 @@ After creating and validating the report, inform the user:
 - ✓ Market research report created at `product/market-research.md`
 - Number of competitors analyzed
 - Key differentiation opportunities identified
+- Optional: Run `/prodkit.gap-analysis` to check for gaps in your documents so far
 - Next step: Run `/prodkit.product-arch` to define the technical architecture
 
 ## Important Notes

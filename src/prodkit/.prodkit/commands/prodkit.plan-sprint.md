@@ -280,6 +280,7 @@ Inform the user:
 - ✓ Sprint plan validated with {X} features selected
 - Features selected: {list}
 - Sprint goal: {goal}
+- Optional: Run `/prodkit.gap-analysis` to check for gaps in the sprint plan
 - Next step: Run `/prodkit.sprint-tech` to create technical design for these features
 
 ## Important Notes

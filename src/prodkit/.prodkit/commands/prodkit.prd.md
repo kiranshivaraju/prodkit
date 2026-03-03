@@ -219,6 +219,7 @@ This is a PRODUCT-LEVEL document (not sprint-level). It contains ALL features fo
    - ✓ PRD created at `product/prd.md`
    - ✓ PRD validated with {X} features defined
    - Total number of features defined
+   - Optional: Run `/prodkit.gap-analysis` to check for gaps in the PRD
    - Next step: Run `/prodkit.market-research` to validate your idea against the competitive landscape
 
 ## Important Notes

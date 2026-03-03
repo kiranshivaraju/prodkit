@@ -603,6 +603,7 @@ Inform the user:
 - Product architecture created in `product/tech-docs/`
 - Speckit constitution created at `.speckit/constitution.md`
 - Configuration updated
+- Optional: Run `/prodkit.gap-analysis` to check for gaps across all documents
 - Next step: Run `/prodkit.init-repo` to initialize the repository
 
 ## Important Notes
