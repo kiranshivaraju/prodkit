@@ -66,6 +66,7 @@ ProdKit will auto-detect your environment and suggest defaults.
 **Available Commands:**
 ```bash
 prodkit init              # Initialize new or existing project (interactive)
+prodkit update            # Sync latest commands into current project
 prodkit check             # Check installed tools and dependencies
 prodkit version           # Show version information
 prodkit list              # List all ProdKit slash commands
@@ -74,7 +75,8 @@ prodkit status            # Show current project status
 
 To upgrade later:
 ```bash
-uv tool upgrade prodkit-cli
+uv tool upgrade prodkit-cli   # 1. Upgrade the package
+prodkit update                 # 2. Sync new/updated commands into your project
 ```
 
 ---

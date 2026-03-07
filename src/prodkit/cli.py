@@ -411,6 +411,66 @@ def init(
 
 
 @app.command()
+def update():
+    """Update ProdKit commands in the current project after upgrading the package."""
+    cwd = Path.cwd()
+    dest_prodkit = cwd / ".prodkit"
+    claude_commands = cwd / ".claude" / "commands"
+
+    if not dest_prodkit.exists():
+        console.print("[red]✗ ProdKit not initialized in this directory. Run 'prodkit init' first.[/red]")
+        sys.exit(1)
+
+    package_dir = Path(__file__).parent
+    source_commands = package_dir / ".prodkit" / "commands"
+
+    if not source_commands.exists():
+        console.print("[red]✗ Bundled commands not found in package.[/red]")
+        sys.exit(1)
+
+    dest_commands = dest_prodkit / "commands"
+    dest_commands.mkdir(parents=True, exist_ok=True)
+    claude_commands.mkdir(parents=True, exist_ok=True)
+
+    added = []
+    updated = []
+
+    for cmd_file in sorted(source_commands.glob("prodkit.*.md")):
+        dest_file = dest_commands / cmd_file.name
+        is_new = not dest_file.exists()
+
+        # Copy command file
+        shutil.copy2(cmd_file, dest_file)
+
+        # Create symlink in .claude/commands
+        _create_link(dest_file, claude_commands / cmd_file.name)
+
+        if is_new:
+            added.append(cmd_file.stem)
+        else:
+            updated.append(cmd_file.stem)
+
+    console.print()
+    console.print(Panel.fit(
+        "[bold green]✓ ProdKit commands updated![/bold green]",
+        title="Update Complete",
+        border_style="green"
+    ))
+
+    if added:
+        console.print(f"\n[green]New commands ({len(added)}):[/green]")
+        for cmd in added:
+            console.print(f"  [green]+[/green] /{cmd}")
+
+    if updated:
+        console.print(f"\n[cyan]Updated commands ({len(updated)}):[/cyan]")
+        for cmd in updated:
+            console.print(f"  [cyan]~[/cyan] /{cmd}")
+
+    console.print(f"\n[dim]Total: {len(added) + len(updated)} commands synced[/dim]")
+
+
+@app.command()
 def version():
     """Show ProdKit version information."""
     from . import __version__
