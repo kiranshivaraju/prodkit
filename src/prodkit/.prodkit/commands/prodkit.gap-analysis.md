@@ -12,6 +12,18 @@ Run this after creating or updating any document.
 
 ## Instructions
 
+### Agent Orchestration (OMC)
+
+If oh-my-claudecode (OMC) is available (check for `mcp__plugin_oh-my-claudecode_t__*` tools), use the following agent delegation strategy. If OMC is not available, proceed with standard execution below.
+
+**Agent delegation:** Fire 3 agents in parallel:
+- **Architecture gaps:** `architect` agent (model: `opus`) reviews each doc for internal gaps and missing sections
+- **Cross-doc consistency:** `verifier` agent (model: `sonnet`) checks consistency across all documents
+- **Security audit:** `security-reviewer` agent (model: `sonnet`) audits security documentation completeness
+- **Report writing:** `writer` agent (model: `haiku`) compiles gap findings into the final report
+
+**Parallel execution:** All 3 review agents run simultaneously. Writer waits for all to complete.
+
 ### Step 1: Scan for Existing Documents
 
 Check which documents exist and report what was found:
@@ -318,3 +330,7 @@ After fixing, run /prodkit.gap-analysis again.
 - Be specific about what's missing — don't just say "needs more detail", say exactly what detail is needed
 - The user flow traceability check is the highest-value analysis — prioritize it
 - This command can be run multiple times — each run should reflect the current state of documents
+
+## Next Step
+This command is complete. The next step in the ProdKit workflow is:
+→ `/prodkit.create-issues` (generate GitHub issues from the tech docs)

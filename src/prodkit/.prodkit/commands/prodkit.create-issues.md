@@ -16,6 +16,16 @@ This command parses the sprint tech docs and creates comprehensive GitHub Issues
 
 ## Instructions
 
+### Agent Orchestration (OMC)
+
+If oh-my-claudecode (OMC) is available (check for `mcp__plugin_oh-my-claudecode_t__*` tools), use the following agent delegation strategy. If OMC is not available, proceed with standard execution below.
+
+**Agent delegation:**
+- **Issue parsing:** Delegate to `executor` agent (model: `sonnet`) to parse tech docs and extract issue specifications
+- **Dependency ordering:** Delegate to `architect` agent (model: `sonnet`) to validate issue dependencies and ordering
+
+**Parallel execution:** Multiple issues can be created simultaneously via GitHub API after dependency ordering is established.
+
 ### Step 1: Read Configuration
 
 Read `.prodkit/config.yml` to get:
@@ -727,3 +737,7 @@ After this command, the user should have:
 4. User confirms → Create issues in GitHub
 5. Link dependencies → Save summary
 6. Ready for `/prodkit.dev`
+
+## Next Step
+This command is complete. The next step in the ProdKit workflow is:
+→ `/prodkit.dev` (start implementing issues with TDD workflow)

@@ -16,6 +16,17 @@ This command reads the PRD (`product/prd.md`) and uses it to research competitor
 
 ## Instructions
 
+### Agent Orchestration (OMC)
+
+If oh-my-claudecode (OMC) is available (check for `mcp__plugin_oh-my-claudecode_t__*` tools), use the following agent delegation strategy. If OMC is not available, proceed with standard execution below.
+
+**Agent delegation:**
+- **Competitor research:** Fire 2-3 `document-specialist` agents in parallel, one per competitor or market segment
+- **Synthesis:** Delegate to `analyst` agent (model: `opus`) to synthesize findings into strategic recommendations
+- **Report writing:** Delegate to `executor` agent (model: `sonnet`) for final report formatting
+
+**Parallel execution:** All competitor lookups run simultaneously. Synthesis waits for all lookups to complete.
+
 ### Step 1: Read the PRD
 
 Read `product/prd.md` to extract:
@@ -237,3 +248,7 @@ After creating and validating the report, inform the user:
 - Focus on actionable insights, not just listing competitors
 - Be honest about risks — if the market is saturated, say so
 - The goal is to help the user build something people actually need
+
+## Next Step
+This command is complete. The next step in the ProdKit workflow is:
+→ `/prodkit.product-arch` (create technical architecture documentation)

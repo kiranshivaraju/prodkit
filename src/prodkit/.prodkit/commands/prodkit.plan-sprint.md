@@ -16,6 +16,16 @@ A sprint is a focused development cycle where specific features from the product
 
 ## Instructions
 
+### Agent Orchestration (OMC)
+
+If oh-my-claudecode (OMC) is available (check for `mcp__plugin_oh-my-claudecode_t__*` tools), use the following agent delegation strategy. If OMC is not available, proceed with standard execution below.
+
+**Agent delegation:**
+- **Sprint scoping:** Delegate to `planner` agent (model: `opus`) to analyze PRD and propose sprint scope with dependency ordering
+- **Dependency analysis:** Delegate to `architect` agent (model: `sonnet`) to validate feature dependencies and identify blockers
+
+**Parallel execution:** Sprint scoping and dependency analysis can run simultaneously, then merge results.
+
 ### Step 1: Determine Sprint Number
 
 Read `.prodkit/config.yml` to get `sprints.current` value.
@@ -310,3 +320,7 @@ After this command, the user should have:
 - Clear sprint goal
 - Understanding of what will be built
 - Ready to move to technical design phase
+
+## Next Step
+This command is complete. The next step in the ProdKit workflow is:
+→ `/prodkit.sprint-tech` (create detailed technical specifications for this sprint)

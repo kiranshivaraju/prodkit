@@ -12,6 +12,18 @@ This command also creates the Speckit constitution, which provides defaults and 
 
 ## Instructions
 
+### Agent Orchestration (OMC)
+
+If oh-my-claudecode (OMC) is available (check for `mcp__plugin_oh-my-claudecode_t__*` tools), use the following agent delegation strategy. If OMC is not available, proceed with standard execution below.
+
+**Agent delegation:**
+- **Tech stack decisions:** Delegate to `architect` agent (model: `opus`) for technology selection and architectural trade-offs
+- **Document creation:** Fire parallel `executor` agents (model: `sonnet`) for each of the 6 tech docs (architecture, API strategy, data models, security, testing, deployment)
+- **Speckit constitution:** Delegate to `writer` agent (model: `haiku`) for constitution drafting
+- **Cross-doc verification:** Use `verifier` agent to check consistency across all 6 documents
+
+**Parallel execution:** All 6 tech docs can be drafted simultaneously after architect sets the tech stack direction.
+
 ### Step 1: Read the PRD
 
 Read `product/prd.md` to understand:
@@ -621,3 +633,7 @@ After this command, the user should have:
 - `.speckit/constitution.md`
 - Updated `.prodkit/config.yml`
 - Clear technical foundation for the product
+
+## Next Step
+This command is complete. The next step in the ProdKit workflow is:
+→ `/prodkit.plan-sprint` (plan the first sprint from the architecture)

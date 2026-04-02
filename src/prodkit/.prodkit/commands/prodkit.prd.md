@@ -12,6 +12,17 @@ This is a PRODUCT-LEVEL document (not sprint-level). It contains ALL features fo
 
 ## Instructions
 
+### Agent Orchestration (OMC)
+
+If oh-my-claudecode (OMC) is available (check for `mcp__plugin_oh-my-claudecode_t__*` tools), use the following agent delegation strategy. If OMC is not available, proceed with standard execution below.
+
+**Agent delegation:**
+- **Requirements analysis:** Delegate to `analyst` agent (model: `opus`) for deep requirements gathering and gap identification
+- **Competitor/market lookup:** Delegate to `document-specialist` agent for external research
+- **Document drafting:** Delegate to `writer` agent (model: `haiku`) for PRD prose sections
+
+**Parallel execution:** Fire independent research tasks (competitor analysis, market lookup) simultaneously.
+
 1. **Gather Product Information**
 
    Ask the user the following questions interactively:
@@ -236,3 +247,8 @@ After running this command, the user should have:
 - `product/prd.md` - Complete PRD with all features
 - Updated `.prodkit/config.yml` with project details
 - Clear understanding of their product vision and features
+
+## Next Step
+This command is complete. The next step in the ProdKit workflow is:
+→ `/prodkit.market-research` (validate market assumptions and competitor landscape)
+→ `/prodkit.product-arch` (create technical architecture documentation)

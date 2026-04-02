@@ -164,6 +164,27 @@ def install_prodkit(target_dir: Path, force: bool = False) -> None:
         finally:
             shutil.rmtree(tmp_dir, ignore_errors=True)
 
+    # Suggest oh-my-claudecode (OMC) for agent orchestration
+    console.print("[cyan]→[/cyan] Checking for oh-my-claudecode (OMC)...")
+    omc_installed = False
+    claude_config = Path.home() / ".claude" / "settings.json"
+    if claude_config.exists():
+        try:
+            import json
+            settings = json.loads(claude_config.read_text())
+            plugins = settings.get("enabledPlugins", {})
+            omc_installed = any("oh-my-claudecode" in k for k in plugins)
+        except Exception:
+            pass
+
+    if omc_installed:
+        console.print("[green]  ✓[/green] oh-my-claudecode detected — ProdKit commands will use agent orchestration")
+    else:
+        console.print("[yellow]  ⚠[/yellow] oh-my-claudecode not detected")
+        console.print("    OMC enables parallel agent orchestration for faster ProdKit workflows")
+        console.print("    Install: [bold]claude /install-plugin oh-my-claudecode[/bold]")
+        console.print("    More info: [link=https://github.com/Yeachan-Heo/oh-my-claudecode]github.com/Yeachan-Heo/oh-my-claudecode[/link]")
+
     # Create placeholder directories
     console.print("[cyan]→[/cyan] Creating project directories...")
     for d in ["product", "sprints", ".prodkit/.state"]:
@@ -175,6 +196,7 @@ def install_prodkit(target_dir: Path, force: bool = False) -> None:
         ".prodkit/cache/",
         ".prodkit/.github-token",
         ".prodkit/.state/",
+        ".omc/",
     }
     if not gitignore.exists():
         console.print("[cyan]→[/cyan] Creating .gitignore...")

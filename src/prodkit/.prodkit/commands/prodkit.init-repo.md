@@ -16,6 +16,14 @@ Ensure these commands have been run first:
 
 ## Instructions
 
+### Agent Orchestration (OMC)
+
+If oh-my-claudecode (OMC) is available (check for `mcp__plugin_oh-my-claudecode_t__*` tools), use the following agent delegation strategy. If OMC is not available, proceed with standard execution below.
+
+**Agent delegation:**
+- **Repository setup:** Delegate to `executor` agent (model: `sonnet`) for GitHub repo creation and configuration
+- **Verification:** Use `verifier` agent to confirm repo is correctly initialized with all required settings
+
 ### Step 1: Read Configuration
 
 Read `.prodkit/config.yml` to understand:
@@ -738,3 +746,7 @@ After this command, the user should have:
 - GitHub repository created (optional)
 - Sprint v1 milestone in GitHub
 - Ready to start sprint planning
+
+## Next Step
+This command is complete. The next step in the ProdKit workflow is:
+→ `/prodkit.prd` (create the Product Requirements Document)

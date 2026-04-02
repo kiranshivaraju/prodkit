@@ -21,6 +21,17 @@ This command can be run:
 
 ## Instructions
 
+### Agent Orchestration (OMC)
+
+If oh-my-claudecode (OMC) is available (check for `mcp__plugin_oh-my-claudecode_t__*` tools), use the following agent delegation strategy. If OMC is not available, proceed with standard execution below.
+
+**Agent delegation:** Fire 2 review agents in parallel:
+- **Code quality:** `code-reviewer` agent (model: `sonnet`) for logic, style, performance, and SOLID principle review
+- **Security:** `security-reviewer` agent (model: `sonnet`) for OWASP Top 10, secrets, and unsafe patterns
+- **Architecture (large diffs >500 lines):** Escalate to `architect` agent (model: `opus`) for architectural review
+
+**Parallel execution:** Code and security reviews always run simultaneously. Architect review runs in parallel when triggered.
+
 ### Step 1: Determine What to Review
 
 Check if arguments were provided:
@@ -462,3 +473,7 @@ After this command:
 - Exit code indicates pass/fail status
 
 This enables both automated review in workflows and manual review anytime.
+
+## Next Step
+This command is complete. The next step in the ProdKit workflow is:
+→ `/prodkit.review` (generate sprint retrospective when sprint is complete)

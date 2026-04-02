@@ -15,6 +15,17 @@ This command creates documentation that reviews everything accomplished in the s
 
 ## Instructions
 
+### Agent Orchestration (OMC)
+
+If oh-my-claudecode (OMC) is available (check for `mcp__plugin_oh-my-claudecode_t__*` tools), use the following agent delegation strategy. If OMC is not available, proceed with standard execution below.
+
+**Agent delegation:**
+- **Data collection:** Delegate to `executor` agent (model: `sonnet`) to query GitHub API for issues, PRs, and commit stats
+- **Code walkthrough:** Delegate to `architect` agent (model: `opus`) for detailed component analysis
+- **Retrospective synthesis:** Delegate to `analyst` agent (model: `opus`) to synthesize metrics, challenges, and recommendations
+
+**Parallel execution:** Data collection and code walkthrough can run simultaneously. Synthesis waits for both to complete.
+
 ### Step 1: Read Configuration
 
 Read `.prodkit/config.yml` to get:
@@ -677,3 +688,7 @@ After this command, the user should have:
 - Code walkthrough for future reference
 - Recommendations for next sprint
 - Closure on Sprint v{N}, ready to move to v{N+1}
+
+## Next Step
+This command is complete. The next step in the ProdKit workflow is:
+→ `/prodkit.plan-sprint` (plan the next sprint based on retrospective recommendations)

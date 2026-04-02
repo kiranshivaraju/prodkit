@@ -18,6 +18,17 @@ Unlike product-level architecture (which is strategic), these docs are detailed 
 
 ## Instructions
 
+### Agent Orchestration (OMC)
+
+If oh-my-claudecode (OMC) is available (check for `mcp__plugin_oh-my-claudecode_t__*` tools), use the following agent delegation strategy. If OMC is not available, proceed with standard execution below.
+
+**Agent delegation:**
+- **Technical design:** Delegate to `architect` agent (model: `opus`) for API design, data model decisions, and implementation strategy
+- **Document creation:** Fire parallel `executor` agents (model: `sonnet`) for each sprint tech doc (data models, API endpoints, implementation plan, component design)
+- **Verification:** Use `verifier` agent to check tech docs align with product-arch documents
+
+**Parallel execution:** All 4 sprint tech docs can be drafted simultaneously after architect sets direction.
+
 ### Step 1: Read Sprint Plan
 
 Read `sprints/v{current_sprint}/sprint-plan.md` to understand:
@@ -901,3 +912,7 @@ After this command, the user should have:
 - Database schemas
 - Component designs
 - Everything needed to create GitHub Issues
+
+## Next Step
+This command is complete. The next step in the ProdKit workflow is:
+→ `/prodkit.gap-analysis` (audit cross-document consistency before implementation)

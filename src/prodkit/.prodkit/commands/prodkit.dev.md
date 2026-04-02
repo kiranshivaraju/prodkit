@@ -16,6 +16,20 @@ The implementation follows TDD: tests are written BEFORE code.
 
 ## Prerequisites
 
+## Agent Orchestration (OMC)
+
+If oh-my-claudecode (OMC) is available (check for `mcp__plugin_oh-my-claudecode_t__*` tools), use the following agent delegation strategy. If OMC is not available, proceed with standard execution below.
+
+**Recommended mode:** Wrap the entire `/prodkit.dev` execution in `ralph` mode for guaranteed completion with verification.
+
+**Agent delegation during implementation:**
+- **Implementation:** Delegate to `executor` agent (model: `sonnet` for standard work, `opus` for complex logic)
+- **Test writing:** Delegate to `test-engineer` agent for TDD test creation and coverage analysis
+- **Code review (Step 8):** Fire `code-reviewer` and `security-reviewer` agents in parallel
+- **Verification:** Use `verifier` agent to confirm all acceptance criteria pass before PR creation
+
+**Parallel execution:** Fire independent agent calls simultaneously. Use `run_in_background: true` for builds, installs, and test suites.
+
 - `/prodkit.create-issues` must have been run (issues exist)
 - Speckit must be installed and configured
 - `gh` CLI must be authenticated
@@ -933,3 +947,7 @@ Review and push:
 Run /prodkit.dev again for next issue
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
+
+## Next Step
+This command is complete. The next step in the ProdKit workflow is:
+→ `/prodkit.code-review` (run comprehensive code review on the implementation)

@@ -16,6 +16,7 @@ Thumbs.db
 /.prodkit/
 /.speckit/
 /.claude/commands/
+/.omc/
 
 # Example/test directories that shouldn't be in the framework repo
 product/
