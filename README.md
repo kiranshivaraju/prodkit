@@ -105,7 +105,14 @@ prodkit update                 # 2. Sync new/updated commands into your project
 /prodkit.sprint-tech   # Create detailed technical docs
 /prodkit.create-issues # Generate GitHub Issues
 /prodkit.dev           # Implement one issue (repeat until done)
+/prodkit.code-review   # AI-powered code review for branches/PRs
 /prodkit.review        # Generate sprint retrospective
+```
+
+### Full Sprint Automation
+
+```bash
+/prodkit.sprint-cycle  # Run entire sprint from planning to review
 ```
 
 ---
@@ -240,6 +247,18 @@ Fetches the highest priority open issue and implements it using Speckit's TDD wo
 
 ---
 
+### `/prodkit.code-review`
+
+**AI-Powered Code Review**
+
+Reviews code changes for security vulnerabilities, quality issues, and adherence to design principles. Can review the current branch, a specific PR, or a commit range. Checks for OWASP Top 10 vulnerabilities, DRY violations, performance concerns, and SOLID principle adherence.
+
+**Output:** Review report displayed (optionally saved to file)
+
+**Run:** During `/prodkit.dev` (automatic) or standalone anytime
+
+---
+
 ### `/prodkit.review`
 
 **Generate Sprint Retrospective**
@@ -249,6 +268,18 @@ Creates comprehensive sprint review with metrics, code walkthrough, accomplishme
 **Output:** `sprints/v{N}/sprint-review.md`
 
 **Run:** Once at the end of each sprint
+
+---
+
+### `/prodkit.sprint-cycle`
+
+**Run Full Sprint From Planning to Review**
+
+Automates the entire sprint lifecycle by chaining all per-sprint commands in sequence: plan-sprint → sprint-tech → gap-analysis → create-issues → dev → code-review → review. Each phase must complete successfully before the next begins.
+
+**Output:** Complete sprint execution with all artifacts
+
+**Run:** Once per sprint (replaces running individual per-sprint commands manually)
 
 ---
 
@@ -270,7 +301,9 @@ your-project/
 │       ├── sprint-tech.md
 │       ├── create-issues.md
 │       ├── dev.md
-│       └── review.md
+│       ├── code-review.md
+│       ├── review.md
+│       └── sprint-cycle.md
 │
 ├── .speckit/
 │   └── constitution.md     # Speckit development defaults
