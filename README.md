@@ -105,6 +105,7 @@ prodkit update                 # 2. Sync new/updated commands into your project
 /prodkit.sprint-tech   # Create detailed technical docs
 /prodkit.create-issues # Generate GitHub Issues
 /prodkit.dev           # Implement one issue (repeat until done)
+/prodkit.test          # Run tests, audit quality, check spec coverage
 /prodkit.code-review   # AI-powered code review for branches/PRs
 /prodkit.review        # Generate sprint retrospective
 ```
@@ -247,6 +248,18 @@ Fetches the highest priority open issue and implements it using Speckit's TDD wo
 
 ---
 
+### `/prodkit.test`
+
+**Run Tests, Audit Quality, and Check Spec Coverage**
+
+Goes beyond "run tests and check coverage." Runs the full test suite, then audits test code for structural quality issues: empty/stub tests, missing assertions, happy-path-only files, and tautological assertions. Cross-references actual test functions against test cases prescribed in sprint tech docs to find missing coverage.
+
+**Output:** `product/test-report.md`
+
+**Run:** After `/prodkit.dev` (recommended) or standalone anytime
+
+---
+
 ### `/prodkit.code-review`
 
 **AI-Powered Code Review**
@@ -301,6 +314,7 @@ your-project/
 │       ├── sprint-tech.md
 │       ├── create-issues.md
 │       ├── dev.md
+│       ├── test.md
 │       ├── code-review.md
 │       ├── review.md
 │       └── sprint-cycle.md

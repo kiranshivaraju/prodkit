@@ -234,6 +234,46 @@ If coverage is below 80%:
 - Write additional tests
 - Re-run until coverage >= 80%
 
+### Step 6b: Test Quality Gate (MANDATORY)
+
+**⚠️ CRITICAL: Do NOT skip this step. Run the test quality audit before proceeding.**
+
+After verifying coverage, audit the test code itself for completeness:
+
+1. **Check for empty/stub tests** — Scan all test files for functions with `pass`, `...`, or no assertions. Any test function without at least one `assert`, `pytest.raises`, or `self.assert*` call is incomplete.
+
+2. **Check for happy-path-only files** — Flag test files that have zero error/failure test cases (no `pytest.raises`, no test names containing "invalid"/"error"/"fail"/"wrong"/"unauthorized"/"not_found").
+
+3. **Cross-reference with sprint tech docs** — Read `sprints/v{N}/tech-docs/api-endpoints.md` and `sprints/v{N}/tech-docs/component-design.md`. For each prescribed test case, verify a corresponding test function exists in `tests/`.
+
+**If critical issues found (empty tests, assert-free tests):**
+- STOP — do not proceed to linter or code review
+- Fix the incomplete tests immediately
+- Re-run `pytest` to verify fixes pass
+- Re-run this audit
+
+**If warnings found (missing error paths, low spec coverage):**
+- Write the missing tests before proceeding
+- Re-run to verify
+
+**Save test audit state:**
+```bash
+mkdir -p .prodkit/.state
+cat > .prodkit/.state/test-audit-latest.json << EOF
+{
+  "completed": true,
+  "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "branch": "$(git branch --show-current)",
+  "empty_tests": ${EMPTY_COUNT:-0},
+  "assertless_tests": ${ASSERTLESS_COUNT:-0},
+  "happy_path_only_files": ${HAPPY_PATH_COUNT:-0},
+  "status": "${AUDIT_STATUS}"
+}
+EOF
+```
+
+**Tip:** You can also run `/prodkit.test` for a more comprehensive standalone audit with spec traceability reporting.
+
 ### Step 7: Run Linter
 
 Run the linter to ensure code quality:

@@ -75,6 +75,17 @@ Execute the following commands in order. Each step must complete successfully be
 
 **Gate:** All sprint issues have merged PRs
 
+#### Phase 5b: Test Validation
+```
+/prodkit.test
+```
+- Runs full test suite with coverage and branch analysis
+- Audits test quality (empty tests, missing assertions, happy-path-only)
+- Cross-references tests against sprint tech doc specifications
+- Fixes any incomplete tests before proceeding
+
+**Gate:** All tests pass, no critical quality issues, spec coverage acceptable
+
 #### Phase 6: Code Review
 ```
 /prodkit.code-review
